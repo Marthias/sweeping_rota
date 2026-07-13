@@ -1,0 +1,11 @@
+[build]
+builder = "nixpacks"
+
+[deploy]
+startCommand = "cd backend && npm install && node server.js"
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 5
+
+[environments.production]
+PORT = "3000"
+NODE_ENV = "production"
