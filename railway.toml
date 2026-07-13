@@ -1,8 +1,8 @@
 [build]
-builder = "nixpacks"
+builder = "railpack"
 
 [deploy]
-startCommand = "cd backend && npm install && node server.js"
+startCommand = "npm install && node server.js"
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 5
 
