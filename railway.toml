@@ -1,5 +1,6 @@
 [build]
 builder = "railpack"
+rootDirectory = "backend"
 
 [deploy]
 startCommand = "npm install && node server.js"
