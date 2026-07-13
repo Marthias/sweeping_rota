@@ -1,7 +1,8 @@
 {
   "build": {
     "builder": "RAILPACK",
-    "buildCommand": "npm install"
+    "buildCommand": "npm install",
+    "rootDirectory": "backend"
   },
   "deploy": {
     "startCommand": "npm start",
