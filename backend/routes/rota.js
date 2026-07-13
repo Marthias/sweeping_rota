@@ -14,4 +14,7 @@ router.get('/upcoming', RotaController.getUpcoming);
 // Generate weekly rota
 router.post('/generate', RotaController.generateWeekly);
 
+//Get rota stats
+router.get('/stats', RotaController.getStats);
+
 module.exports = router;

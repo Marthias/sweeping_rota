@@ -59,6 +59,26 @@ class RotaController {
             res.status(500).json({ error: error.message });
         }
     }
+
+    static async getHistory(req, res) {
+    try {
+        const history = await Rota.getSweptHistory(10);
+        res.json({ success: true, data: history });
+    } catch (error) {
+        console.error('Error getting history:', error);
+        res.status(500).json({ error: 'Failed to get history' });
+    }
+}
+
+static async getStats(req, res) {
+    try {
+        const stats = await Rota.getStats();
+        res.json({ success: true, data: stats });
+    } catch (error) {
+        console.error('Error getting stats:', error);
+        res.status(500).json({ error: 'Failed to get stats' });
+    }
+}
 }
 
 module.exports = RotaController;
