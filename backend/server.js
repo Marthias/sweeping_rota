@@ -12,6 +12,7 @@ const bcrypt = require('bcryptjs');
 dotenv.config({ path: path.join(__dirname, '../.env') });
 
 const promisePool = require("./config/database");
+const { runMigrations } = require('./migrations');
 
 const app = express();
 const server = http.createServer(app);
@@ -23,9 +24,12 @@ const io = socketIo(server, {
     }
 });
 
-// Test database connection
+// Run migrations then test database connection
 (async () => {
     try {
+        await runMigrations(promisePool);
+        console.log('✅ Migrations complete!');
+
         const [rows] = await promisePool.query('SELECT 1');
         console.log('✅ Database connected successfully!');
     } catch (error) {
