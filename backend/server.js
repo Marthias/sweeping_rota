@@ -551,12 +551,22 @@ app.use(session({
 }));
 
 // Serve static files from frontend
-app.use(express.static(path.join(__dirname, '../frontend')));
+const frontendPath = path.resolve(__dirname, '../frontend');
+const frontendExists = require('fs').existsSync(frontendPath);
 
-// Serve the main HTML file
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/index.html'));
-});
+if (frontendExists) {
+    app.use(express.static(frontendPath));
+    app.get('/', (req, res) => {
+        res.sendFile(path.join(frontendPath, 'index.html'));
+    });
+} else {
+    app.get('/', (req, res) => {
+        res.status(200).json({
+            status: 'ok',
+            message: 'Backend is running, but the frontend assets are not available in this deployment.'
+        });
+    });
+}
 
 // ============================================
 // USE ROUTES

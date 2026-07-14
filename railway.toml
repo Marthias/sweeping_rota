@@ -1,9 +1,7 @@
 [build]
 builder = "railpack"
-rootDirectory = "backend"
-
 [deploy]
-startCommand = "npm install && node server.js"
+startCommand = "node server.js"
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 5
 
