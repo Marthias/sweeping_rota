@@ -7,6 +7,7 @@ const cron = require('node-cron');
 const path = require('path');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
+const swapRoutes = require('./routes/swap');
 
 
 // Import EmailService
@@ -21,6 +22,8 @@ const rotaRoutes = require('./routes/rota');
 const Rota = require('./models/Rota');
 const User = require('./models/User');
 const NotificationService = require('./utils/notification');
+
+
 
 dotenv.config();
 
@@ -114,6 +117,8 @@ if (frontendExists) {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/rota', rotaRoutes);
+
+app.use('/api/swap', swapRoutes);
 
 // ============================================
 // NOTIFICATION SERVICE

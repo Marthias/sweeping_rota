@@ -10,6 +10,7 @@ class SweepingRotaApp {
         this.setupAuthListeners();
         this.setupEventListeners();
         this.setupSettings();
+        this.setupSwapListeners(); 
         this.updateTime();
         setInterval(() => this.updateTime(), 1000);
         
@@ -85,6 +86,8 @@ class SweepingRotaApp {
         
         this.loadTodaySweeper();
         this.loadUpcomingSchedule();
+        this.loadSwapData(); 
+        this.loadStats(); 
         this.loadSweptHistory();
         this.loadStats(); 
         
@@ -656,6 +659,266 @@ displayStats(stats) {
     html += `</ul></div>`;
     content.innerHTML = html;
 }
+
+//new code starts here 
+
+// ============================================
+// SWAP FEATURE
+// ============================================
+
+async loadSwapData() {
+    await this.loadPendingSwaps();
+    await this.loadSwapHistory();
+    await this.loadUsersForSwap();
+}
+
+async loadUsersForSwap() {
+    try {
+        const response = await fetch('/api/users', {
+            credentials: 'include'
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            const select = document.getElementById('swapToUser');
+            const currentUserId = this.currentUser.id;
+            
+            select.innerHTML = '<option value="">Select roommate...</option>';
+            data.users.forEach(user => {
+                if (user.id !== currentUserId) {
+                    select.innerHTML += `
+                        <option value="${user.id}">${user.name}</option>
+                    `;
+                }
+            });
+        }
+    } catch (error) {
+        console.error('Error loading users:', error);
+    }
+}
+
+async loadPendingSwaps() {
+    try {
+        const response = await fetch('/api/swap/pending', {
+            credentials: 'include'
+        });
+        const data = await response.json();
+        
+        if (data.success && data.data.length > 0) {
+            this.displayPendingSwaps(data.data);
+        } else {
+            document.getElementById('pendingSwapsList').innerHTML = 
+                '<p style="color: #888; text-align: center;">No pending swap requests</p>';
+        }
+    } catch (error) {
+        console.error('Error loading pending swaps:', error);
+    }
+}
+
+displayPendingSwaps(swaps) {
+    const list = document.getElementById('pendingSwapsList');
+    
+    list.innerHTML = swaps.map(swap => {
+        const isFromMe = swap.from_user_id === this.currentUser.id;
+        const isToMe = swap.to_user_id === this.currentUser.id;
+        
+        let actions = '';
+        if (isToMe) {
+            actions = `
+                <button onclick="window.app.approveSwap(${swap.id})" class="btn btn-success btn-sm">
+                    ✅ Approve
+                </button>
+                <button onclick="window.app.rejectSwap(${swap.id})" class="btn btn-danger btn-sm">
+                    ❌ Reject
+                </button>
+            `;
+        } else if (isFromMe) {
+            actions = `
+                <button onclick="window.app.cancelSwap(${swap.id})" class="btn btn-secondary btn-sm">
+                    Cancel
+                </button>
+            `;
+        }
+        
+        return `
+            <div class="swap-item">
+                <div class="swap-info">
+                    <strong>${swap.from_name}</strong> 
+                    ↔️ <strong>${swap.to_name}</strong>
+                    <br>
+                    📅 ${new Date(swap.from_date).toLocaleDateString()} → ${new Date(swap.to_date).toLocaleDateString()}
+                    ${swap.message ? `<br>💬 "${swap.message}"` : ''}
+                    <span class="badge badge-warning">⏳ Pending</span>
+                </div>
+                <div class="swap-actions">
+                    ${actions}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+
+async loadSwapHistory() {
+    try {
+        const response = await fetch('/api/swap/history', {
+            credentials: 'include'
+        });
+        const data = await response.json();
+        
+        if (data.success && data.data.length > 0) {
+            this.displaySwapHistory(data.data);
+        }
+    } catch (error) {
+        console.error('Error loading swap history:', error);
+    }
+}
+
+displaySwapHistory(history) {
+    const list = document.getElementById('swapHistoryList');
+    
+    list.innerHTML = history.map(swap => {
+        const statusColors = {
+            'approved': '✅',
+            'rejected': '❌',
+            'cancelled': '🚫'
+        };
+        
+        return `
+            <div class="swap-item history-item">
+                <div class="swap-info">
+                    <strong>${swap.from_name}</strong> 
+                    ↔️ <strong>${swap.to_name}</strong>
+                    <br>
+                    📅 ${new Date(swap.from_date).toLocaleDateString()} → ${new Date(swap.to_date).toLocaleDateString()}
+                    <span class="badge ${swap.status}">
+                        ${statusColors[swap.status] || ''} ${swap.status}
+                    </span>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+async createSwapRequest() {
+    const to_user_id = document.getElementById('swapToUser').value;
+    const from_date = document.getElementById('swapFromDate').value;
+    const to_date = document.getElementById('swapToDate').value;
+    const message = document.getElementById('swapMessage').value;
+    
+    if (!to_user_id || !from_date || !to_date) {
+        this.showNotification('Please fill in all required fields', 'error');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/swap/request', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ to_user_id, from_date, to_date, message }),
+            credentials: 'include'
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            this.showNotification('✅ Swap request sent!', 'success');
+            // Clear form
+            document.getElementById('swapToUser').value = '';
+            document.getElementById('swapFromDate').value = '';
+            document.getElementById('swapToDate').value = '';
+            document.getElementById('swapMessage').value = '';
+            await this.loadPendingSwaps();
+        } else {
+            this.showNotification('❌ ' + data.error, 'error');
+        }
+    } catch (error) {
+        console.error('Error creating swap request:', error);
+        this.showNotification('❌ Failed to create swap request', 'error');
+    }
+}
+
+async approveSwap(requestId) {
+    if (!confirm('Approve this swap request?')) return;
+    
+    try {
+        const response = await fetch('/api/swap/approve', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ requestId }),
+            credentials: 'include'
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            this.showNotification('✅ Swap approved! Dates updated.', 'success');
+            await this.loadPendingSwaps();
+            await this.loadSwapHistory();
+            await this.loadTodaySweeper();
+            await this.loadUpcomingSchedule();
+        } else {
+            this.showNotification('❌ ' + data.error, 'error');
+        }
+    } catch (error) {
+        console.error('Error approving swap:', error);
+        this.showNotification('❌ Failed to approve swap', 'error');
+    }
+}
+
+async rejectSwap(requestId) {
+    if (!confirm('Reject this swap request?')) return;
+    
+    try {
+        const response = await fetch('/api/swap/reject', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ requestId }),
+            credentials: 'include'
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            this.showNotification('Swap request rejected', 'info');
+            await this.loadPendingSwaps();
+            await this.loadSwapHistory();
+        } else {
+            this.showNotification('❌ ' + data.error, 'error');
+        }
+    } catch (error) {
+        console.error('Error rejecting swap:', error);
+        this.showNotification('❌ Failed to reject swap', 'error');
+    }
+}
+
+async cancelSwap(requestId) {
+    if (!confirm('Cancel this swap request?')) return;
+    
+    try {
+        const response = await fetch('/api/swap/cancel', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ requestId }),
+            credentials: 'include'
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            this.showNotification('Swap request cancelled', 'info');
+            await this.loadPendingSwaps();
+            await this.loadSwapHistory();
+        } else {
+            this.showNotification('❌ ' + data.error, 'error');
+        }
+    } catch (error) {
+        console.error('Error cancelling swap:', error);
+        this.showNotification('❌ Failed to cancel swap', 'error');
+    }
+}
+
+//to here
 }
 
 // Initialize app when DOM is ready
@@ -664,3 +927,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const app = new SweepingRotaApp();
     window.app = app;
 });
+
+
+

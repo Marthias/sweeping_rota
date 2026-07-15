@@ -128,6 +128,26 @@ class AuthController {
             });
         }
     }
+
+    // Get all users (for swap dropdown)
+static async getAllUsers(req, res) {
+    try {
+        const users = await User.getAllActive();
+        res.json({
+            success: true,
+            users: users.map(u => ({
+                id: u.id,
+                name: u.name,
+                email: u.email
+            }))
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+}
 }
 
 module.exports = AuthController;

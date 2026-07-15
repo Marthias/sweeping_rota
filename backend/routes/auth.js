@@ -14,4 +14,7 @@ router.post('/logout', AuthController.logout);
 // Get current user
 router.get('/me', AuthController.getCurrentUser);
 
+//Get all users (admin)
+router.get('/users', AuthController.getAllUsers);
+
 module.exports = router;

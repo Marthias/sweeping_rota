@@ -129,6 +129,55 @@
             </div>
             </section>
 
+            <!-- Swap Section -->
+<section id="swapSection" class="card">
+    <h2><i class="fas fa-exchange-alt"></i> Swap Requests</h2>
+    
+    <!-- Create Swap Form -->
+    <div class="swap-form">
+        <h3>Request a Swap</h3>
+        <div class="form-group">
+            <label>Swap With:</label>
+            <select id="swapToUser" class="form-control">
+                <option value="">Select roommate...</option>
+            </select>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Your Day:</label>
+                <input type="date" id="swapFromDate" class="form-control">
+            </div>
+            <div class="form-group">
+                <label>Their Day:</label>
+                <input type="date" id="swapToDate" class="form-control">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Message (optional):</label>
+            <textarea id="swapMessage" class="form-control" rows="2" placeholder="Why do you want to swap?"></textarea>
+        </div>
+        <button id="swapRequestBtn" class="btn btn-primary">
+            <i class="fas fa-paper-plane"></i> Send Swap Request
+        </button>
+    </div>
+    
+    <!-- Pending Swaps -->
+    <div id="pendingSwaps">
+        <h3>Pending Requests</h3>
+        <div id="pendingSwapsList">
+            <p style="color: #888; text-align: center;">No pending swap requests</p>
+        </div>
+    </div>
+    
+    <!-- Swap History -->
+    <div id="swapHistory">
+        <h3>Swap History</h3>
+        <div id="swapHistoryList">
+            <p style="color: #888; text-align: center;">No swap history</p>
+        </div>
+    </div>
+</section>
+
             <!-- Action Buttons -->
             <div id="actions">
                 <button id="sweptBtn" class="btn btn-success" disabled>
@@ -236,8 +285,15 @@
     }
     </script>
 
-    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
-    <script src="js/socket.js"></script>
-    <script src="js/app.js"></script>
+            <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+            <script src="js/socket.js"></script>
+            <script src="js/app.js">
+
+    </script>
+
 </body>
+
+
+
 </html>
+

@@ -79,6 +79,8 @@ static async getStats(req, res) {
         res.status(500).json({ error: 'Failed to get stats' });
     }
 }
+
+
 }
 
 module.exports = RotaController;

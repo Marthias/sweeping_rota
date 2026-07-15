@@ -1134,3 +1134,450 @@ body.dark-mode #statsContent h3 {
 body.dark-mode .history-item {
     background: #1e1e2e;
 }
+
+/* ============================================
+   SWAP SECTION STYLES
+   ============================================ */
+
+/* Swap Section Container */
+#swapSection {
+    margin-top: 20px;
+}
+
+/* Swap Form */
+.swap-form {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    border: 1px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.swap-form:hover {
+    border-color: #667eea;
+    box-shadow: 0 2px 10px rgba(102, 126, 234, 0.1);
+}
+
+.swap-form h3 {
+    font-size: 1rem;
+    color: #333;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.swap-form h3 i {
+    color: #667eea;
+}
+
+.swap-form .form-group {
+    margin-bottom: 15px;
+}
+
+.swap-form .form-group label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #555;
+    margin-bottom: 5px;
+}
+
+.swap-form .form-group label i {
+    color: #667eea;
+    margin-right: 5px;
+    width: 18px;
+}
+
+.swap-form .form-control {
+    width: 100%;
+    padding: 10px 14px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    background: white;
+    color: #333;
+}
+
+.swap-form .form-control:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.swap-form .form-control::placeholder {
+    color: #aaa;
+}
+
+.swap-form textarea.form-control {
+    resize: vertical;
+    min-height: 60px;
+    font-family: inherit;
+}
+
+/* Form Row (two columns) */
+.swap-form .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+/* Swap Button */
+.swap-form .btn-primary {
+    width: 100%;
+    padding: 12px;
+    font-size: 1rem;
+    margin-top: 5px;
+}
+
+/* Pending Swaps List */
+#pendingSwaps {
+    margin-top: 25px;
+}
+
+#pendingSwaps h3 {
+    font-size: 1rem;
+    color: #333;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#pendingSwaps h3 i {
+    color: #ffc107;
+}
+
+#pendingSwapsList {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Swap Item */
+.swap-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 18px;
+    background: white;
+    border-radius: 10px;
+    border-left: 4px solid #ffc107;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s ease;
+    gap: 15px;
+}
+
+.swap-item:hover {
+    transform: translateX(4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.swap-item.history-item {
+    border-left-color: #6c757d;
+    opacity: 0.8;
+}
+
+.swap-item.history-item:hover {
+    opacity: 1;
+}
+
+.swap-item .swap-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.swap-item .swap-info strong {
+    color: #333;
+    font-weight: 600;
+}
+
+.swap-item .swap-info .swap-arrow {
+    color: #667eea;
+    margin: 0 5px;
+}
+
+.swap-item .swap-info .swap-date {
+    color: #666;
+    font-size: 0.9rem;
+    display: block;
+    margin-top: 4px;
+}
+
+.swap-item .swap-info .swap-message {
+    color: #888;
+    font-size: 0.85rem;
+    font-style: italic;
+    margin-top: 4px;
+    padding: 4px 10px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    display: inline-block;
+}
+
+.swap-item .swap-info .badge {
+    display: inline-block;
+    padding: 3px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-top: 5px;
+}
+
+.swap-item .swap-info .badge.badge-warning {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.swap-item .swap-info .badge.approved {
+    background: #d4edda;
+    color: #155724;
+}
+
+.swap-item .swap-info .badge.rejected {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.swap-item .swap-info .badge.cancelled {
+    background: #e2e3e5;
+    color: #383d41;
+}
+
+/* Swap Actions */
+.swap-item .swap-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.swap-item .swap-actions .btn {
+    padding: 6px 14px;
+    font-size: 0.85rem;
+    border-radius: 8px;
+    white-space: nowrap;
+}
+
+.swap-item .swap-actions .btn-success {
+    background: #28a745;
+    color: white;
+}
+
+.swap-item .swap-actions .btn-success:hover {
+    background: #218838;
+}
+
+.swap-item .swap-actions .btn-danger {
+    background: #dc3545;
+    color: white;
+}
+
+.swap-item .swap-actions .btn-danger:hover {
+    background: #c82333;
+}
+
+.swap-item .swap-actions .btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.swap-item .swap-actions .btn-secondary:hover {
+    background: #5a6268;
+}
+
+/* Swap History */
+#swapHistory {
+    margin-top: 25px;
+}
+
+#swapHistory h3 {
+    font-size: 1rem;
+    color: #333;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#swapHistory h3 i {
+    color: #6c757d;
+}
+
+#swapHistoryList {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+#swapHistoryList .swap-item {
+    border-left-color: #6c757d;
+    opacity: 0.8;
+}
+
+#swapHistoryList .swap-item:hover {
+    opacity: 1;
+}
+
+/* ============================================
+   DARK MODE - SWAP SECTION
+   ============================================ */
+
+body.dark-mode .swap-form {
+    background: #2a2a3e;
+    border-color: #3a3a4e;
+}
+
+body.dark-mode .swap-form h3 {
+    color: #e0e0e0;
+}
+
+body.dark-mode .swap-form .form-group label {
+    color: #aaa;
+}
+
+body.dark-mode .swap-form .form-control {
+    background: #1e1e2e;
+    color: #e0e0e0;
+    border-color: #3a3a4e;
+}
+
+body.dark-mode .swap-form .form-control:focus {
+    border-color: #667eea;
+    background: #1e1e2e;
+}
+
+body.dark-mode .swap-form .form-control::placeholder {
+    color: #666;
+}
+
+body.dark-mode #pendingSwaps h3,
+body.dark-mode #swapHistory h3 {
+    color: #e0e0e0;
+}
+
+body.dark-mode .swap-item {
+    background: #1e1e2e;
+    border-color: #4a4a5e;
+}
+
+body.dark-mode .swap-item .swap-info strong {
+    color: #e0e0e0;
+}
+
+body.dark-mode .swap-item .swap-info .swap-date {
+    color: #888;
+}
+
+body.dark-mode .swap-item .swap-info .swap-message {
+    background: #2a2a3e;
+    color: #aaa;
+}
+
+body.dark-mode .swap-item .swap-info .badge.badge-warning {
+    background: #3a3a1a;
+    color: #ffc107;
+}
+
+body.dark-mode .swap-item .swap-info .badge.approved {
+    background: #1a3a2a;
+    color: #28a745;
+}
+
+body.dark-mode .swap-item .swap-info .badge.rejected {
+    background: #3a1a1a;
+    color: #dc3545;
+}
+
+body.dark-mode .swap-item .swap-info .badge.cancelled {
+    background: #2a2a3e;
+    color: #888;
+}
+
+/* ============================================
+   RESPONSIVE - SWAP SECTION
+   ============================================ */
+
+@media (max-width: 768px) {
+    .swap-form .form-row {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    
+    .swap-item {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+        padding: 15px;
+    }
+    
+    .swap-item .swap-actions {
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-top: 8px;
+    }
+    
+    .swap-item .swap-actions .btn {
+        flex: 1;
+        min-width: 80px;
+        justify-content: center;
+    }
+    
+    .swap-form .btn-primary {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .swap-form {
+        padding: 15px;
+    }
+    
+    .swap-item {
+        padding: 12px;
+        font-size: 0.9rem;
+    }
+    
+    .swap-item .swap-actions .btn {
+        font-size: 0.8rem;
+        padding: 5px 10px;
+    }
+    
+    .swap-item .swap-info .swap-date {
+        font-size: 0.8rem;
+    }
+}
+
+/* Empty state styling */
+#pendingSwapsList p,
+#swapHistoryList p {
+    text-align: center;
+    color: #888;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    font-style: italic;
+}
+
+body.dark-mode #pendingSwapsList p,
+body.dark-mode #swapHistoryList p {
+    background: #2a2a3e;
+    color: #666;
+}
+
+/* Animation for new swap items */
+.swap-item {
+    animation: fadeInSlide 0.3s ease;
+}
+
+@keyframes fadeInSlide {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
