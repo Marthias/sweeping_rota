@@ -7,7 +7,6 @@ const cron = require('node-cron');
 const path = require('path');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
-const swapRoutes = require('./routes/swap');
 
 
 // Import EmailService
@@ -17,6 +16,8 @@ const emailService = new EmailService();
 // Import routes
 const authRoutes = require('./routes/auth');
 const rotaRoutes = require('./routes/rota');
+const profileRoutes = require('./routes/profile');
+const swapRoutes = require('./routes/swap');
 
 // Import models and utils
 const Rota = require('./models/Rota');
@@ -117,8 +118,8 @@ if (frontendExists) {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/rota', rotaRoutes);
-
 app.use('/api/swap', swapRoutes);
+app.use('/api/profile', profileRoutes);
 
 // ============================================
 // NOTIFICATION SERVICE

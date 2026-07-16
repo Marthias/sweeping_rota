@@ -90,6 +90,7 @@ class SweepingRotaApp {
         this.loadStats(); 
         this.loadSweptHistory();
         this.loadStats(); 
+        this.loadProfile();
         
         if (window.socketManager) {
             window.socketManager.registerUser(this.currentUser.id);
@@ -919,6 +920,385 @@ async cancelSwap(requestId) {
 }
 
 //to here
+
+// ============================================
+// PROFILE FEATURE
+// ============================================
+
+async loadProfile() {
+    try {
+        const response = await fetch('/api/profile/me', {
+            credentials: 'include'
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            this.displayProfile(data.user, data.stats);
+            // Show profile section
+            document.getElementById('profileSection').style.display = 'block';
+        } else {
+            this.showNotification('Failed to load profile', 'error');
+        }
+    } catch (error) {
+        console.error('Error loading profile:', error);
+        this.showNotification('Error loading profile', 'error');
+    }
+}
+
+displayProfile(user, stats) {
+    const container = document.getElementById('profileContent');
+    
+    // Create avatar initials if no avatar
+    const initials = user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+    const avatarUrl = user.avatar_url || '';
+    
+    container.innerHTML = `
+        <div class="profile-container">
+            <!-- Avatar Section -->
+            <div class="profile-avatar-section">
+                <div class="profile-avatar-wrapper">
+                    ${avatarUrl ? 
+                        `<img src="${avatarUrl}" alt="${user.name}" class="profile-avatar">` :
+                        `<div class="profile-avatar" style="background: #667eea; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; color: white;">${initials}</div>`
+                    }
+                    <label class="profile-avatar-upload" title="Change avatar">
+                        <i class="fas fa-camera"></i>
+                        <input type="file" id="avatarInput" accept="image/*">
+                    </label>
+                </div>
+            </div>
+            
+            <!-- Profile Info -->
+            <div class="profile-info">
+                <div class="profile-name">${user.name}</div>
+                <div class="profile-email"><i class="fas fa-envelope"></i> ${user.email}</div>
+                ${user.phone ? `<div class="profile-phone"><i class="fas fa-phone"></i> ${user.phone}</div>` : ''}
+                
+                <div class="profile-bio ${!user.bio ? 'profile-bio-empty' : ''}">
+                    ${user.bio || 'No bio yet. Tell your roommates about yourself!'}
+                </div>
+                
+                <div class="profile-stats-grid">
+                    <div class="profile-stat-item">
+                        <span class="profile-stat-number">${stats.total_sweeps}</span>
+                        <span class="profile-stat-label">🧹 Total Sweeps</span>
+                    </div>
+                    <div class="profile-stat-item">
+                        <span class="profile-stat-number">${stats.streak}</span>
+                        <span class="profile-stat-label">🔥 Day Streak</span>
+                    </div>
+                    <div class="profile-stat-item">
+                        <span class="profile-stat-number">#${stats.rank}</span>
+                        <span class="profile-stat-label">🏆 Rank</span>
+                    </div>
+                    <div class="profile-stat-item">
+                        <span class="profile-stat-number">${stats.monthly_sweeps}</span>
+                        <span class="profile-stat-label">📅 This Month</span>
+                    </div>
+                </div>
+                
+                <!-- Edit Profile Button -->
+                <button id="editProfileBtn" class="btn btn-primary" style="width: 100%; margin-top: 15px;">
+                    <i class="fas fa-edit"></i> Edit Profile
+                </button>
+                
+                <!-- Edit Form -->
+                <div id="editProfileForm" style="display: none;" class="profile-edit-form">
+                    <h3 style="margin-bottom: 15px;"><i class="fas fa-user-edit"></i> Edit Profile</h3>
+                    <div class="form-group">
+                        <label for="editName"><i class="fas fa-user"></i> Full Name</label>
+                        <input type="text" id="editName" class="form-control" value="${user.name}">
+                    </div>
+                    <div class="form-group">
+                        <label for="editEmail"><i class="fas fa-envelope"></i> Email</label>
+                        <input type="email" id="editEmail" class="form-control" value="${user.email}">
+                    </div>
+                    <div class="form-group">
+                        <label for="editPhone"><i class="fas fa-phone"></i> Phone</label>
+                        <input type="tel" id="editPhone" class="form-control" value="${user.phone || ''}" placeholder="Enter phone number">
+                    </div>
+                    <div class="form-group">
+                        <label for="editBio"><i class="fas fa-comment"></i> Bio</label>
+                        <textarea id="editBio" class="form-control" rows="3" placeholder="Tell your roommates about yourself...">${user.bio || ''}</textarea>
+                    </div>
+                    <div class="profile-edit-actions">
+                        <button id="saveProfileBtn" class="btn btn-success">
+                            <i class="fas fa-save"></i> Save Changes
+                        </button>
+                        <button id="cancelEditBtn" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancel
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Account Settings -->
+                <div class="profile-settings-section">
+                    <h3><i class="fas fa-cog"></i> Account Settings</h3>
+                    
+                    <button id="changePasswordBtn" class="btn btn-primary" style="width: 100%; margin-bottom: 10px;">
+                        <i class="fas fa-key"></i> Change Password
+                    </button>
+                    
+                    <div id="changePasswordForm" style="display: none;" class="profile-edit-form">
+                        <h3 style="margin-bottom: 15px;"><i class="fas fa-key"></i> Change Password</h3>
+                        <div class="form-group">
+                            <label><i class="fas fa-lock"></i> Current Password</label>
+                            <input type="password" id="currentPassword" class="form-control" placeholder="Enter current password">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-lock"></i> New Password</label>
+                            <input type="password" id="newPassword" class="form-control" placeholder="Enter new password (min 6 chars)">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-lock"></i> Confirm New Password</label>
+                            <input type="password" id="confirmPassword" class="form-control" placeholder="Confirm new password">
+                        </div>
+                        <div class="profile-edit-actions">
+                            <button id="savePasswordBtn" class="btn btn-success">
+                                <i class="fas fa-save"></i> Update Password
+                            </button>
+                            <button id="cancelPasswordBtn" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancel
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="danger-zone">
+                        <h4><i class="fas fa-exclamation-triangle"></i> Danger Zone</h4>
+                        <p>Once you delete your account, all your data will be permanently removed. This action cannot be undone.</p>
+                        <button id="deleteAccountBtn" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Delete Account
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Attach event listeners
+    this.attachProfileListeners();
+}
+
+attachProfileListeners() {
+    // Toggle edit form
+    const editBtn = document.getElementById('editProfileBtn');
+    const editForm = document.getElementById('editProfileForm');
+    
+    if (editBtn) {
+        editBtn.addEventListener('click', () => {
+            editForm.style.display = editForm.style.display === 'none' ? 'block' : 'none';
+        });
+    }
+    
+    const cancelEdit = document.getElementById('cancelEditBtn');
+    if (cancelEdit) {
+        cancelEdit.addEventListener('click', () => {
+            editForm.style.display = 'none';
+        });
+    }
+    
+    // Save profile
+    const saveBtn = document.getElementById('saveProfileBtn');
+    if (saveBtn) {
+        saveBtn.addEventListener('click', () => {
+            this.saveProfile();
+        });
+    }
+    
+    // Avatar upload
+    const avatarInput = document.getElementById('avatarInput');
+    if (avatarInput) {
+        avatarInput.addEventListener('change', (e) => {
+            this.uploadAvatar(e);
+        });
+    }
+    
+    // Toggle password form
+    const passBtn = document.getElementById('changePasswordBtn');
+    const passForm = document.getElementById('changePasswordForm');
+    if (passBtn) {
+        passBtn.addEventListener('click', () => {
+            passForm.style.display = passForm.style.display === 'none' ? 'block' : 'none';
+        });
+    }
+    
+    const cancelPass = document.getElementById('cancelPasswordBtn');
+    if (cancelPass) {
+        cancelPass.addEventListener('click', () => {
+            passForm.style.display = 'none';
+        });
+    }
+    
+    // Save password
+    const savePass = document.getElementById('savePasswordBtn');
+    if (savePass) {
+        savePass.addEventListener('click', () => {
+            this.changePassword();
+        });
+    }
+    
+    // Delete account
+    const deleteBtn = document.getElementById('deleteAccountBtn');
+    if (deleteBtn) {
+        deleteBtn.addEventListener('click', () => {
+            this.deleteAccount();
+        });
+    }
+}
+
+async saveProfile() {
+    const name = document.getElementById('editName').value.trim();
+    const email = document.getElementById('editEmail').value.trim();
+    const phone = document.getElementById('editPhone').value.trim();
+    const bio = document.getElementById('editBio').value.trim();
+    
+    if (!name || !email) {
+        this.showNotification('Name and email are required', 'error');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/profile/update', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email, phone, bio }),
+            credentials: 'include'
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            this.showNotification('✅ Profile updated successfully!', 'success');
+            document.getElementById('editProfileForm').style.display = 'none';
+            await this.loadProfile();
+            document.getElementById('userName').textContent = `👋 ${data.user.name}`;
+        } else {
+            this.showNotification('❌ ' + data.error, 'error');
+        }
+    } catch (error) {
+        console.error('Error saving profile:', error);
+        this.showNotification('Error saving profile', 'error');
+    }
+}
+
+async uploadAvatar(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    if (file.size > 2 * 1024 * 1024) {
+        this.showNotification('Image must be less than 2MB', 'error');
+        return;
+    }
+    
+    const formData = new FormData();
+    formData.append('avatar', file);
+    
+    try {
+        const response = await fetch('/api/profile/avatar', {
+            method: 'POST',
+            body: formData,
+            credentials: 'include'
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            this.showNotification('✅ Avatar updated!', 'success');
+            await this.loadProfile();
+        } else {
+            this.showNotification('❌ ' + data.error, 'error');
+        }
+    } catch (error) {
+        console.error('Error uploading avatar:', error);
+        this.showNotification('Error uploading avatar', 'error');
+    }
+    
+    event.target.value = '';
+}
+
+async changePassword() {
+    const currentPassword = document.getElementById('currentPassword').value;
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    
+    if (!currentPassword || !newPassword || !confirmPassword) {
+        this.showNotification('All password fields are required', 'error');
+        return;
+    }
+    
+    if (newPassword.length < 6) {
+        this.showNotification('New password must be at least 6 characters', 'error');
+        return;
+    }
+    
+    if (newPassword !== confirmPassword) {
+        this.showNotification('New passwords do not match', 'error');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/profile/change-password', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ currentPassword, newPassword, confirmPassword }),
+            credentials: 'include'
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            this.showNotification('✅ Password changed successfully!', 'success');
+            document.getElementById('changePasswordForm').style.display = 'none';
+            document.getElementById('currentPassword').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+        } else {
+            this.showNotification('❌ ' + data.error, 'error');
+        }
+    } catch (error) {
+        console.error('Error changing password:', error);
+        this.showNotification('Error changing password', 'error');
+    }
+}
+
+async deleteAccount() {
+    const confirmed = confirm(
+        '⚠️ WARNING: This will permanently delete your account and all data.\n\n' +
+        'This action CANNOT be undone.\n\n' +
+        'Are you sure you want to continue?'
+    );
+    
+    if (!confirmed) return;
+    
+    const password = prompt('Please enter your password to confirm account deletion:');
+    if (!password) return;
+    
+    try {
+        const response = await fetch('/api/profile/delete-account', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ confirmPassword: password }),
+            credentials: 'include'
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            this.showNotification('Account deleted successfully', 'info');
+            // Redirect to login
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
+        } else {
+            this.showNotification('❌ ' + data.error, 'error');
+        }
+    } catch (error) {
+        console.error('Error deleting account:', error);
+        this.showNotification('Error deleting account', 'error');
+    }
+}
+
+
 }
 
 // Initialize app when DOM is ready
