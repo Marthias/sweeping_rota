@@ -1,7 +1,7 @@
 {
   "build": {
     "builder": "RAILPACK",
-    "buildCommand": "cd backend && npm install"
+    "buildCommand": "cd backend && npm install --legacy-peer-deps"
   },
   "deploy": {
     "startCommand": "npm start",
