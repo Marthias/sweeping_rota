@@ -32,11 +32,14 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
     cors: {
-        origin: process.env.CLIENT_URL || "*",
+        origin: process.env.CLIENT_URL || process.env.APP_URL || true,
         methods: ["GET", "POST"],
         credentials: true
     }
 });
+
+// Trust proxy when running behind Railway / other HTTPS proxies
+app.set('trust proxy', 1);
 
 // Database connection
 const mysql = require('mysql2');
@@ -76,9 +79,11 @@ const { runMigrations } = require('./migrations');
 // Make pool available globally
 app.set('db', promisePool);
 
+const clientOrigin = process.env.CLIENT_URL || process.env.APP_URL || true;
+
 // Middleware
 app.use(cors({
-    origin: process.env.CLIENT_URL || "*",
+    origin: clientOrigin,
     credentials: true
 }));
 app.use(express.json());
@@ -90,6 +95,7 @@ app.use(session({
     saveUninitialized: false,
     cookie: { 
         secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
         maxAge: 24 * 60 * 60 * 1000
     }
 }));

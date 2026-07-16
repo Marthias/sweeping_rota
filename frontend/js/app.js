@@ -89,8 +89,9 @@ class SweepingRotaApp {
         this.loadSwapData(); 
         this.loadStats(); 
         this.loadSweptHistory();
-        this.loadStats(); 
         this.loadProfile();
+        this.loadStats(); 
+        
         
         if (window.socketManager) {
             window.socketManager.registerUser(this.currentUser.id);
