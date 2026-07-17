@@ -639,74 +639,41 @@ async loadStats() {
     }
 }
 
-// displayStats(stats) {
-//     const content = document.getElementById('statsContent');
-    
-//     if (!stats.sweeps || stats.sweeps.length === 0) {
-//         content.innerHTML = '<p style="text-align: center; color: #666;">No stats available yet</p>';
-//         return;
-//     }
-
-//     let html = `
-//         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-bottom: 20px;">
-//             <div style="background: #667eea; color: white; padding: 15px; border-radius: 12px; text-align: center;">
-//                 <div style="font-size: 1.8rem; font-weight: bold;">${stats.totalCompleted}</div>
-//                 <div style="font-size: 0.85rem; opacity: 0.9;">Total Sweeps</div>
-//             </div>
-//             ${stats.topStreak ? `
-//             <div style="background: #ffc107; color: #333; padding: 15px; border-radius: 12px; text-align: center;">
-//                 <div style="font-size: 1.8rem; font-weight: bold;">${stats.topStreak.streak_30days}</div>
-//                 <div style="font-size: 0.85rem; opacity: 0.9;">${stats.topStreak.name}'s Streak</div>
-//             </div>
-//             ` : ''}
-//             <div style="background: #28a745; color: white; padding: 15px; border-radius: 12px; text-align: center;">
-//                 <div style="font-size: 1.8rem; font-weight: bold;">${stats.sweeps.length}</div>
-//                 <div style="font-size: 0.85rem; opacity: 0.9;">Active Sweepers</div>
-//             </div>
-//         </div>
-//         <div style="margin-top: 15px;">
-//             <h3 style="margin-bottom: 10px; font-size: 0.95rem; color: #666;">🏆 Leaderboard</h3>
-//             <ul style="list-style: none;">
-//     `;
-
-//     stats.sweeps.slice(0, 5).forEach((user, index) => {
-//         const medals = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣'];
-//         html += `
-//             <li style="display: flex; justify-content: space-between; padding: 8px 12px; background: white; margin-bottom: 5px; border-radius: 8px;">
-//                 <span>${medals[index] || `${index + 1}.`} ${user.name}</span>
-//                 <span style="font-weight: bold; color: #667eea;">${user.total_sweeps} sweeps</span>
-//             </li>
-//         `;
-//     });
-
-//     html += `</ul></div>`;
-//     content.innerHTML = html;
-// }
-
-
-
 displayStats(stats) {
     const content = document.getElementById('statsContent');
     
-    if (!stats || stats.length === 0) {
+    if (!stats.sweeps || stats.sweeps.length === 0) {
         content.innerHTML = '<p style="text-align: center; color: #666;">No stats available yet</p>';
         return;
     }
 
     let html = `
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-bottom: 20px;">
+            <div style="background: #667eea; color: white; padding: 15px; border-radius: 12px; text-align: center;">
+                <div style="font-size: 1.8rem; font-weight: bold;">${stats.totalCompleted}</div>
+                <div style="font-size: 0.85rem; opacity: 0.9;">Total Sweeps</div>
+            </div>
+            ${stats.topStreak ? `
+            <div style="background: #ffc107; color: #333; padding: 15px; border-radius: 12px; text-align: center;">
+                <div style="font-size: 1.8rem; font-weight: bold;">${stats.topStreak.streak_30days}</div>
+                <div style="font-size: 0.85rem; opacity: 0.9;">${stats.topStreak.name}'s Streak</div>
+            </div>
+            ` : ''}
+            <div style="background: #28a745; color: white; padding: 15px; border-radius: 12px; text-align: center;">
+                <div style="font-size: 1.8rem; font-weight: bold;">${stats.sweeps.length}</div>
+                <div style="font-size: 0.85rem; opacity: 0.9;">Active Sweepers</div>
+            </div>
+        </div>
         <div style="margin-top: 15px;">
             <h3 style="margin-bottom: 10px; font-size: 0.95rem; color: #666;">🏆 Leaderboard</h3>
             <ul style="list-style: none;">
     `;
 
-    stats.slice(0, 5).forEach((user, index) => {
+    stats.sweeps.slice(0, 5).forEach((user, index) => {
         const medals = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣'];
         html += `
-            <li style="display: flex; justify-content: space-between; padding: 8px 12px; background: white; margin-bottom: 5px; border-radius: 8px; cursor: pointer;" 
-                onclick="window.app.viewUserProfile(${user.id})" 
-                onmouseover="this.style.transform='translateX(5px)'" 
-                onmouseout="this.style.transform='translateX(0)'">
-                <span>${medals[index] || `${index + 1}.`} <span style="font-weight: 500;">${user.name}</span></span>
+            <li style="display: flex; justify-content: space-between; padding: 8px 12px; background: white; margin-bottom: 5px; border-radius: 8px;">
+                <span>${medals[index] || `${index + 1}.`} ${user.name}</span>
                 <span style="font-weight: bold; color: #667eea;">${user.total_sweeps} sweeps</span>
             </li>
         `;
