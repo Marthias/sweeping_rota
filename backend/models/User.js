@@ -18,10 +18,25 @@ class User {
         return rows[0];
     }
 
-    static async findById(id) {
-        const [rows] = await pool.query('SELECT id, name, email, phone, is_active FROM users WHERE id = ?', [id]);
-        return rows[0];
-    }
+   static async findById(id) {
+    const [rows] = await pool.query(
+        `SELECT
+            id,
+            name,
+            email,
+            phone,
+            bio,
+            avatar_url,
+            theme_preference,
+            created_at,
+            is_active
+        FROM users
+        WHERE id = ?`,
+        [id]
+    );
+
+    return rows[0];
+}
 
     static async getAllActive() {
         const [rows] = await pool.query('SELECT id, name, email, phone FROM users WHERE is_active = TRUE');
