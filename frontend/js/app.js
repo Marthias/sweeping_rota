@@ -1403,19 +1403,43 @@ async saveProfile() {
 
 async viewUserProfile(userId) {
     try {
+        console.log('🔍 Viewing profile for user:', userId);
+        
         const response = await fetch(`/api/profile/user/${userId}`, {
             credentials: 'include'
         });
+        
+        console.log('📡 Response status:', response.status);
+        
         const data = await response.json();
+        console.log('📊 Profile data:', data);
         
         if (data.success) {
+            // Check if the user object has all required properties
+            if (!data.user) {
+                console.error('❌ No user data in response');
+                this.showNotification('User data not found', 'error');
+                return;
+            }
+            
+            // Ensure stats have default values
+            if (!data.stats) {
+                data.stats = {
+                    total_sweeps: 0,
+                    monthly_sweeps: 0,
+                    streak: 0,
+                    rank: 1
+                };
+            }
+            
             this.displayUserProfile(data.user, data.stats);
             document.getElementById('userProfileModal').style.display = 'block';
         } else {
-            this.showNotification('Failed to load user profile', 'error');
+            console.error('❌ API returned error:', data.error);
+            this.showNotification(data.error || 'Failed to load user profile', 'error');
         }
     } catch (error) {
-        console.error('Error loading user profile:', error);
+        console.error('❌ Error loading user profile:', error);
         this.showNotification('Error loading user profile', 'error');
     }
 }
@@ -1423,71 +1447,101 @@ async viewUserProfile(userId) {
 displayUserProfile(user, stats) {
     const container = document.getElementById('userProfileContent');
     
-    const initials = user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+    // Safety check - ensure user data exists
+    if (!user) {
+        container.innerHTML = `
+            <div style="text-align: center; padding: 40px 20px;">
+                <p style="color: #dc3545;">User not found</p>
+                <button onclick="document.getElementById('userProfileModal').style.display='none'" class="btn btn-secondary">
+                    Close
+                </button>
+            </div>
+        `;
+        return;
+    }
+    
+    // Get initials for avatar fallback
+    const initials = user.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : '?';
     const avatarUrl = user.avatar_url || '';
+    
+    // Ensure stats have default values
+    const totalSweeps = stats?.total_sweeps || 0;
+    const monthlySweeps = stats?.monthly_sweeps || 0;
+    const streak = stats?.streak || 0;
+    const rank = stats?.rank || 1;
     
     container.innerHTML = `
         <div class="profile-container" style="text-align: center;">
-            <div class="profile-avatar-section">
-                <div class="profile-avatar-wrapper">
+            <!-- Avatar Section -->
+            <div class="profile-avatar-section" style="padding: 10px 0;">
+                <div class="profile-avatar-wrapper" style="display: inline-block;">
                     ${avatarUrl ? 
-                        `<img src="${avatarUrl}" alt="${user.name}" class="profile-avatar">` :
-                        `<div class="profile-avatar" style="background: #667eea; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; color: white;">${initials}</div>`
+                        `<img src="${avatarUrl}" alt="${user.name}" class="profile-avatar" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 4px solid #667eea;">` :
+                        `<div class="profile-avatar" style="width: 100px; height: 100px; border-radius: 50%; background: #667eea; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; color: white; margin: 0 auto;">${initials}</div>`
                     }
                 </div>
             </div>
             
-            <div class="profile-info">
-                <div class="profile-name">${user.name}</div>
-                <div class="profile-email"><i class="fas fa-envelope"></i> ${user.email}</div>
-                ${user.phone ? `<div class="profile-phone"><i class="fas fa-phone"></i> ${user.phone}</div>` : ''}
+            <!-- Profile Info -->
+            <div class="profile-info" style="padding: 10px 0;">
+                <div class="profile-name" style="font-size: 1.5rem; font-weight: 700; color: #1a1a2e; margin-bottom: 2px;">
+                    ${user.name || 'Unknown User'}
+                </div>
+                <div class="profile-email" style="color: #65676b; font-size: 0.95rem;">
+                    <i class="fas fa-envelope" style="color: #667eea;"></i> ${user.email || 'No email'}
+                </div>
+                ${user.phone ? `<div class="profile-phone" style="color: #65676b; font-size: 0.9rem; margin-top: 2px;"><i class="fas fa-phone" style="color: #667eea;"></i> ${user.phone}</div>` : ''}
                 
-                <div class="profile-bio ${!user.bio ? 'profile-bio-empty' : ''}">
+                <!-- Bio -->
+                <div class="profile-bio" style="margin: 15px 0; padding: 12px 16px; background: #f0f2f5; border-radius: 8px; color: #1a1a2e; ${!user.bio ? 'font-style: italic; color: #65676b;' : ''}">
                     ${user.bio || 'No bio yet.'}
                 </div>
                 
-                <div class="profile-stats-grid">
-                    <div class="profile-stat-item">
-                        <span class="profile-stat-number">${stats.total_sweeps}</span>
-                        <span class="profile-stat-label">🧹 Total Sweeps</span>
+                <!-- Stats -->
+                <div class="profile-stats-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 16px 0; padding: 12px 0; border-top: 1px solid #e4e6eb; border-bottom: 1px solid #e4e6eb;">
+                    <div class="profile-stat-item" style="text-align: center;">
+                        <span class="profile-stat-number" style="font-size: 1.5rem; font-weight: 700; color: #1a1a2e; display: block;">${totalSweeps}</span>
+                        <span class="profile-stat-label" style="font-size: 0.75rem; color: #65676b; display: block; margin-top: 2px; text-transform: uppercase;">Sweeps</span>
                     </div>
-                    <div class="profile-stat-item">
-                        <span class="profile-stat-number">${stats.streak}</span>
-                        <span class="profile-stat-label">🔥 Day Streak</span>
+                    <div class="profile-stat-item" style="text-align: center;">
+                        <span class="profile-stat-number" style="font-size: 1.5rem; font-weight: 700; color: #1a1a2e; display: block;">${streak}</span>
+                        <span class="profile-stat-label" style="font-size: 0.75rem; color: #65676b; display: block; margin-top: 2px; text-transform: uppercase;">Streak</span>
                     </div>
-                    <div class="profile-stat-item">
-                        <span class="profile-stat-number">#${stats.rank}</span>
-                        <span class="profile-stat-label">🏆 Rank</span>
+                    <div class="profile-stat-item" style="text-align: center;">
+                        <span class="profile-stat-number" style="font-size: 1.5rem; font-weight: 700; color: #1a1a2e; display: block;">#${rank}</span>
+                        <span class="profile-stat-label" style="font-size: 0.75rem; color: #65676b; display: block; margin-top: 2px; text-transform: uppercase;">Rank</span>
                     </div>
-                    <div class="profile-stat-item">
-                        <span class="profile-stat-number">${stats.monthly_sweeps}</span>
-                        <span class="profile-stat-label">📅 This Month</span>
+                    <div class="profile-stat-item" style="text-align: center;">
+                        <span class="profile-stat-number" style="font-size: 1.5rem; font-weight: 700; color: #1a1a2e; display: block;">${monthlySweeps}</span>
+                        <span class="profile-stat-label" style="font-size: 0.75rem; color: #65676b; display: block; margin-top: 2px; text-transform: uppercase;">This Month</span>
                     </div>
                 </div>
                 
-                ${user.is_own_profile ? `
-                    <div style="margin-top: 15px; padding: 10px; background: #d4edda; border-radius: 8px; color: #155724;">
-                        <i class="fas fa-user-check"></i> This is you!
-                    </div>
-                ` : ''}
+                <!-- Viewing indicator -->
+                <div style="margin-top: 12px; padding: 8px 12px; background: #f0f2f5; border-radius: 6px; font-size: 0.85rem; color: #65676b;">
+                    <i class="fas fa-eye" style="color: #667eea;"></i> Viewing ${user.name || 'user'}'s profile
+                </div>
             </div>
         </div>
     `;
     
-    // Close modal
-    document.getElementById('closeUserProfile').addEventListener('click', () => {
-        document.getElementById('userProfileModal').style.display = 'none';
-    });
-    
-    document.getElementById('userProfileModal').addEventListener('click', (e) => {
-        if (e.target === document.getElementById('userProfileModal')) {
+    // Close modal handlers
+    const closeBtn = document.getElementById('closeUserProfile');
+    if (closeBtn) {
+        closeBtn.onclick = () => {
             document.getElementById('userProfileModal').style.display = 'none';
-        }
-    });
+        };
+    }
+    
+    const modal = document.getElementById('userProfileModal');
+    if (modal) {
+        modal.onclick = (e) => {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        };
+    }
 }
-
-
-
 
 
 }
@@ -1498,6 +1552,3 @@ document.addEventListener('DOMContentLoaded', () => {
     const app = new SweepingRotaApp();
     window.app = app;
 });
-
-
-

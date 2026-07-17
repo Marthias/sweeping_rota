@@ -17,4 +17,8 @@ router.post('/change-password', ProfileController.changePassword);
 // Delete account
 router.delete('/delete-account', ProfileController.deleteAccount);
 
+// Get other user's profile
+router.get('/user/:userId', ProfileController.getUserProfile);
+
+
 module.exports = router;
