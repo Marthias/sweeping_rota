@@ -17,11 +17,12 @@
     "express-mysql-session": "^2.1.8",
     "express-session": "^1.17.3",
     "multer": "^2.2.0",
-    "multer-storage-cloudinary": "^4.0.0",
     "mysql2": "^3.6.0",
     "node-cron": "^3.0.2",
     "nodemailer": "^9.0.3",
-    "socket.io": "^4.7.2"
+    "socket.io": "^4.7.2",
+    "streamifier": "^0.1.1",
+    "web-push": "^3.6.7"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"

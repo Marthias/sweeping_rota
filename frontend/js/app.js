@@ -453,6 +453,7 @@ class SweepingRotaApp {
         `;
     }).join('');
 }
+
     async markAsSwept() {
     if (!this.todaySweeper) return;
     
@@ -499,6 +500,7 @@ class SweepingRotaApp {
         sweptBtn.innerHTML = '<i class="fas fa-check"></i> I\'ve Swept!';
     }
 }
+
     async generateRota() {
         try {
             const response = await fetch('/api/rota/generate', {
@@ -682,8 +684,6 @@ displayStats(stats) {
     html += `</ul></div>`;
     content.innerHTML = html;
 }
-
-
 
 // ============================================
 // SWAP FEATURE
@@ -972,7 +972,11 @@ displayProfile(user, stats) {
     
     // Create avatar initials if no avatar
     const initials = user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-    const avatarUrl = user.avatar_url || '';
+    //const avatarUrl = user.avatar_url || '';
+    
+    const avatarUrl = user.avatar_url
+    ? `${user.avatar_url}?t=${Date.now()}`
+    : '';
     
     container.innerHTML = `
         <div class="profile-container">

@@ -2,8 +2,7 @@ const pool = require('../config/database');
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const cloudinary = require('cloudinary').v2;
-const multer = require('multer');
-const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const upload = require('../middleware/upload');
 
 // Configure Cloudinary
 cloudinary.config({
@@ -12,47 +11,10 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-// Configure multer storage for Cloudinary
-const storage = new CloudinaryStorage({
-    cloudinary: cloudinary,
-    params: {
-        folder: 'sweeping-rota/avatars',
-        format: async (req, file) => {
-            // Convert to jpg for consistency
-            return 'jpg';
-        },
-        public_id: (req, file) => {
-            // Generate unique filename with user ID
-            const userId = req.session?.userId || 'unknown';
-            return `user_${userId}_${Date.now()}`;
-        },
-        transformation: [
-            { width: 200, height: 200, crop: 'fill', gravity: 'face' },
-            { quality: 'auto:good' }
-        ]
-    }
-});
-
-// Configure multer
-const upload = multer({
-    storage: storage,
-    limits: {
-        fileSize: 2 * 1024 * 1024 // 2MB limit
-    },
-    fileFilter: (req, file, cb) => {
-        const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-        if (allowedTypes.includes(file.mimetype)) {
-            cb(null, true);
-        } else {
-            cb(new Error('Only JPEG, PNG, GIF, and WebP images are allowed'));
-        }
-    }
-});
 
 class ProfileController {
-    // ============================================
+    
     // GET PROFILE
-    // ============================================
     static async getProfile(req, res) {
     try {
         const userId = req.session.userId;
@@ -146,9 +108,8 @@ class ProfileController {
         });
     }
 }
-    // ============================================
+    
     // UPDATE PROFILE
-    // ============================================
     static async updateProfile(req, res) {
         try {
             const userId = req.session.userId;
@@ -213,67 +174,113 @@ class ProfileController {
         }
     }
 
-    // ============================================
     // UPLOAD AVATAR
-    // ============================================
-    static async uploadAvatar(req, res) {
-        try {
-            const userId = req.session.userId;
-            
-            if (!userId) {
-                return res.status(401).json({
-                    success: false,
-                    error: 'Not authenticated'
-                });
-            }
-            
-            if (!req.file) {
-                return res.status(400).json({
-                    success: false,
-                    error: 'No file uploaded'
-                });
-            }
-            
-            // Get old avatar URL
-            const [user] = await pool.query(
-                'SELECT avatar_url FROM users WHERE id = ?',
-                [userId]
-            );
-            const oldAvatarUrl = user[0]?.avatar_url;
-            
-            // Update user with new avatar URL
-            await pool.query(
-                'UPDATE users SET avatar_url = ? WHERE id = ?',
-                [req.file.path, userId]
-            );
-            
-            // Delete old avatar from Cloudinary (if exists and not default)
-            if (oldAvatarUrl && !oldAvatarUrl.includes('default-avatar')) {
-                try {
-                    const publicId = oldAvatarUrl.split('/').pop().split('.')[0];
-                    await cloudinary.uploader.destroy(`sweeping-rota/avatars/${publicId}`);
-                } catch (deleteError) {
-                    console.log('Could not delete old avatar:', deleteError.message);
-                }
-            }
-            
-            res.json({
-                success: true,
-                message: 'Avatar updated successfully!',
-                avatar_url: req.file.path
-            });
-        } catch (error) {
-            console.error('Error uploading avatar:', error);
-            res.status(500).json({
+   static async uploadAvatar(req, res) {
+    try {
+        const userId = req.session.userId;
+
+        if (!userId) {
+            return res.status(401).json({
                 success: false,
-                error: error.message
+                error: "Not authenticated"
             });
         }
-    }
 
-    // ============================================
+        if (!req.file) {
+            return res.status(400).json({
+                success: false,
+                error: "No file uploaded"
+            });
+        }
+
+        const streamifier = require("streamifier");
+
+        // Get previous avatar
+        const [user] = await pool.query(
+            "SELECT avatar_url FROM users WHERE id = ?",
+            [userId]
+        );
+
+        const oldAvatarUrl = user[0]?.avatar_url;
+
+        // Upload to Cloudinary
+        const uploadResult = await new Promise((resolve, reject) => {
+
+            const stream = cloudinary.uploader.upload_stream(
+                {
+                    folder: "sweeping-rota/avatars",
+                    public_id: `user_${userId}_${Date.now()}`,
+                    transformation: [
+                        {
+                            width: 200,
+                            height: 200,
+                            crop: "fill",
+                            gravity: "face"
+                        }
+                    ]
+                },
+                (error, result) => {
+
+                    if (error) {
+                        return reject(error);
+                    }
+
+                    resolve(result);
+                }
+            );
+
+            streamifier.createReadStream(req.file.buffer).pipe(stream);
+
+        });
+
+        // Save URL
+        await pool.query(
+            "UPDATE users SET avatar_url = ? WHERE id = ?",
+            [uploadResult.secure_url, userId]
+        );
+
+        // Delete previous avatar
+        if (oldAvatarUrl && oldAvatarUrl.includes("cloudinary")) {
+
+            try {
+
+                const publicId =
+                    oldAvatarUrl
+                        .split("/")
+                        .slice(-2)
+                        .join("/")
+                        .split(".")[0];
+
+                await cloudinary.uploader.destroy(publicId);
+
+            } catch (err) {
+
+                console.log("Old avatar not deleted:", err.message);
+
+            }
+
+        }
+
+        res.json({
+            success: true,
+            message: "Avatar updated successfully!",
+            avatar_url: uploadResult.secure_url
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+
+    }
+}
+
+    
     // CHANGE PASSWORD
-    // ============================================
     static async changePassword(req, res) {
         try {
             const userId = req.session.userId;
@@ -352,9 +359,8 @@ class ProfileController {
         }
     }
 
-    // ============================================
+   
     // DELETE ACCOUNT
-    // ============================================
     static async deleteAccount(req, res) {
         try {
             const userId = req.session.userId;
@@ -426,9 +432,8 @@ class ProfileController {
         }
     }
 
-    // ============================================
 // GET OTHER USER'S PROFILE
-// ============================================
+
 static async getUserProfile(req, res) {
     try {
         const userId = req.params.userId;
