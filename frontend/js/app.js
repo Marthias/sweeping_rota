@@ -10,6 +10,7 @@ class SweepingRotaApp {
         this.setupAuthListeners();
         this.setupEventListeners();
         this.setupSettings();
+        window.navigationManager.init();
         this.setupSwapListeners(); 
         this.updateTime();
         setInterval(() => this.updateTime(), 1000);
@@ -32,10 +33,9 @@ class SweepingRotaApp {
         }
     }
 
-    // ============================================
+   
     // AUTHENTICATION
-    // ============================================
-
+  
     async checkAuth() {
         try {
             const response = await fetch('/api/auth/me', {
@@ -179,10 +179,8 @@ class SweepingRotaApp {
         }, 5000);
     }
 
-    // ============================================
     // SETTINGS & MODAL CONTROLS
-    // ============================================
-
+   
     setupSettings() {
         console.log('Setting up settings...');
         
@@ -347,9 +345,8 @@ class SweepingRotaApp {
         }
     }
 
-    // ============================================
+    
     // ROTA FUNCTIONS
-    // ============================================
 
     async loadTodaySweeper() {
         try {
@@ -685,9 +682,9 @@ displayStats(stats) {
     content.innerHTML = html;
 }
 
-// ============================================
+
 // SWAP FEATURE
-// ============================================
+
 
 async loadSwapData() {
     await this.loadPendingSwaps();
@@ -967,17 +964,154 @@ async loadProfile() {
     }
 }
 
+// displayProfile(user, stats) {
+//     const container = document.getElementById('profileContent');
+    
+//     // Create avatar initials if no avatar
+//     const initials = user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+//     //const avatarUrl = user.avatar_url || '';
+    
+//     const avatarUrl = user.avatar_url
+//     ? `${user.avatar_url}?t=${Date.now()}`
+//     : '';
+
+//     container.innerHTML = `
+//         <div class="profile-container">
+//             <!-- Avatar Section -->
+//             <div class="profile-avatar-section">
+//                 <div class="profile-avatar-wrapper">
+//                     ${avatarUrl ? 
+//                         `<img src="${avatarUrl}" alt="${user.name}" class="profile-avatar">` :
+//                         `<div class="profile-avatar" style="background: #667eea; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; color: white;">${initials}</div>`
+//                     }
+//                     <label class="profile-avatar-upload" title="Change avatar">
+//                         <i class="fas fa-camera"></i>
+//                         <input type="file" id="avatarInput" accept="image/*">
+//                     </label>
+//                 </div>
+//             </div>
+            
+//             <!-- Profile Info -->
+//             <div class="profile-info">
+//                 <div class="profile-name">${user.name}</div>
+//                 <div class="profile-email"><i class="fas fa-envelope"></i> ${user.email}</div>
+//                 ${user.phone ? `<div class="profile-phone"><i class="fas fa-phone"></i> ${user.phone}</div>` : ''}
+                
+//                 <div class="profile-bio ${!user.bio ? 'profile-bio-empty' : ''}">
+//                     ${user.bio || 'No bio yet. Tell your roommates about yourself!'}
+//                 </div>
+                
+//                 <div class="profile-stats-grid">
+//                     <div class="profile-stat-item">
+//                         <span class="profile-stat-number">${stats.total_sweeps}</span>
+//                         <span class="profile-stat-label">🧹 Total Sweeps</span>
+//                     </div>
+//                     <div class="profile-stat-item">
+//                         <span class="profile-stat-number">${stats.streak}</span>
+//                         <span class="profile-stat-label">🔥 Day Streak</span>
+//                     </div>
+//                     <div class="profile-stat-item">
+//                         <span class="profile-stat-number">#${stats.rank}</span>
+//                         <span class="profile-stat-label">🏆 Rank</span>
+//                     </div>
+//                     <div class="profile-stat-item">
+//                         <span class="profile-stat-number">${stats.monthly_sweeps}</span>
+//                         <span class="profile-stat-label">📅 This Month</span>
+//                     </div>
+//                 </div>
+                
+//                 <!-- Edit Profile Button -->
+//                 <button id="editProfileBtn" class="btn btn-primary" style="width: 100%; margin-top: 15px;">
+//                     <i class="fas fa-edit"></i> Edit Profile
+//                 </button>
+                
+//                 <!-- Edit Form -->
+//                 <div id="editProfileForm" style="display: none;" class="profile-edit-form">
+//                     <h3 style="margin-bottom: 15px;"><i class="fas fa-user-edit"></i> Edit Profile</h3>
+//                     <div class="form-group">
+//                         <label for="editName"><i class="fas fa-user"></i> Full Name</label>
+//                         <input type="text" id="editName" class="form-control" value="${user.name}">
+//                     </div>
+//                     <div class="form-group">
+//                         <label for="editEmail"><i class="fas fa-envelope"></i> Email</label>
+//                         <input type="email" id="editEmail" class="form-control" value="${user.email}">
+//                     </div>
+//                     <div class="form-group">
+//                         <label for="editPhone"><i class="fas fa-phone"></i> Phone</label>
+//                         <input type="tel" id="editPhone" class="form-control" value="${user.phone || ''}" placeholder="Enter phone number">
+//                     </div>
+//                     <div class="form-group">
+//                         <label for="editBio"><i class="fas fa-comment"></i> Bio</label>
+//                         <textarea id="editBio" class="form-control" rows="3" placeholder="Tell your roommates about yourself...">${user.bio || ''}</textarea>
+//                     </div>
+//                     <div class="profile-edit-actions">
+//                         <button id="saveProfileBtn" class="btn btn-success">
+//                             <i class="fas fa-save"></i> Save Changes
+//                         </button>
+//                         <button id="cancelEditBtn" class="btn btn-secondary">
+//                             <i class="fas fa-times"></i> Cancel
+//                         </button>
+//                     </div>
+//                 </div>
+                
+//                 <!-- Account Settings -->
+//                 <div class="profile-settings-section">
+//                     <h3><i class="fas fa-cog"></i> Account Settings</h3>
+                    
+//                     <button id="changePasswordBtn" class="btn btn-primary" style="width: 100%; margin-bottom: 10px;">
+//                         <i class="fas fa-key"></i> Change Password
+//                     </button>
+                    
+//                     <div id="changePasswordForm" style="display: none;" class="profile-edit-form">
+//                         <h3 style="margin-bottom: 15px;"><i class="fas fa-key"></i> Change Password</h3>
+//                         <div class="form-group">
+//                             <label><i class="fas fa-lock"></i> Current Password</label>
+//                             <input type="password" id="currentPassword" class="form-control" placeholder="Enter current password">
+//                         </div>
+//                         <div class="form-group">
+//                             <label><i class="fas fa-lock"></i> New Password</label>
+//                             <input type="password" id="newPassword" class="form-control" placeholder="Enter new password (min 6 chars)">
+//                         </div>
+//                         <div class="form-group">
+//                             <label><i class="fas fa-lock"></i> Confirm New Password</label>
+//                             <input type="password" id="confirmPassword" class="form-control" placeholder="Confirm new password">
+//                         </div>
+//                         <div class="profile-edit-actions">
+//                             <button id="savePasswordBtn" class="btn btn-success">
+//                                 <i class="fas fa-save"></i> Update Password
+//                             </button>
+//                             <button id="cancelPasswordBtn" class="btn btn-secondary">
+//                                 <i class="fas fa-times"></i> Cancel
+//                             </button>
+//                         </div>
+//                     </div>
+                    
+//                     <div class="danger-zone">
+//                         <h4><i class="fas fa-exclamation-triangle"></i> Danger Zone</h4>
+//                         <p>Once you delete your account, all your data will be permanently removed. This action cannot be undone.</p>
+//                         <button id="deleteAccountBtn" class="btn btn-danger">
+//                             <i class="fas fa-trash"></i> Delete Account
+//                         </button>
+//                     </div>
+//                 </div>
+//             </div>
+//         </div>
+//     `;
+    
+//     // Attach event listeners
+//     this.attachProfileListeners();
+// }
+
 displayProfile(user, stats) {
     const container = document.getElementById('profileContent');
     
     // Create avatar initials if no avatar
     const initials = user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-    //const avatarUrl = user.avatar_url || '';
     
     const avatarUrl = user.avatar_url
-    ? `${user.avatar_url}?t=${Date.now()}`
-    : '';
-    
+        ? `${user.avatar_url}?t=${Date.now()}`
+        : '';
+
     container.innerHTML = `
         <div class="profile-container">
             <!-- Avatar Section -->
@@ -1089,6 +1223,37 @@ displayProfile(user, stats) {
                         </div>
                     </div>
                     
+                    <!-- 👇 PUSH NOTIFICATIONS SECTION (NEW) 👇 -->
+                    <div class="profile-settings-section" style="margin-top: 20px; padding-top: 16px; border-top: 1px solid #e4e6eb;">
+                        <h3><i class="fas fa-bell"></i> Push Notifications</h3>
+                        
+                        <div class="settings-item" style="cursor: default; display: flex; justify-content: space-between; align-items: center; padding: 8px 0;">
+                            <div class="settings-item-left" style="display: flex; align-items: center; gap: 12px;">
+                                <i class="fas fa-bell" style="color: #667eea; font-size: 1.2rem;"></i>
+                                <div>
+                                    <span style="font-weight: 500;">Browser Notifications</span>
+                                    <div style="font-size: 0.8rem; color: #65676b; margin-top: 2px;">
+                                        Get notifications even when the app is closed
+                                    </div>
+                                </div>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" id="pushToggle">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+
+                        <div id="pushStatus" style="font-size: 0.85rem; padding: 8px 12px; border-radius: 6px; margin-top: 8px; background: #d1ecf1; color: #0c5460;">
+                            Loading...
+                        </div>
+
+                        <button id="pushTestBtn" class="btn btn-primary" style="margin-top: 10px; width: 100%; justify-content: center; display: none;">
+                            <i class="fas fa-paper-plane"></i> Test Notification
+                        </button>
+                    </div>
+                    <!-- 👆 END OF PUSH NOTIFICATIONS 👆 -->
+                    
+
                     <div class="danger-zone">
                         <h4><i class="fas fa-exclamation-triangle"></i> Danger Zone</h4>
                         <p>Once you delete your account, all your data will be permanently removed. This action cannot be undone.</p>
@@ -1170,6 +1335,9 @@ attachProfileListeners() {
             this.deleteAccount();
         });
     }
+
+    // Setup push notification listeners
+    this.setupPushListeners();
 }
 
 async saveProfile() {
@@ -1511,6 +1679,113 @@ displayUserProfile(user, stats) {
                 modal.style.display = 'none';
             }
         };
+    }
+}
+
+// PUSH NOTIFICATIONS
+
+// ============================================
+// PUSH NOTIFICATIONS
+// ============================================
+
+setupPushListeners() {
+    const toggle = document.getElementById('pushToggle');
+    const testBtn = document.getElementById('pushTestBtn');
+    const statusEl = document.getElementById('pushStatus');
+    
+    if (!toggle) {
+        console.error('Push toggle not found');
+        return;
+    }
+    
+    // Update status initially
+    this.updatePushStatus();
+    
+    toggle.addEventListener('change', async () => {
+        console.log('Push toggle changed to:', toggle.checked);
+        
+        if (toggle.checked) {
+            // Check if push manager exists
+            if (!window.pushManager) {
+                console.error('Push manager not initialized');
+                this.showNotification('Push notifications not supported in this browser', 'error');
+                toggle.checked = false;
+                return;
+            }
+            
+            const result = await window.pushManager.subscribe();
+            console.log('Subscribe result:', result);
+            
+            if (result.success) {
+                this.showNotification('✅ Push notifications enabled!', 'success');
+                this.updatePushStatus();
+            } else {
+                toggle.checked = false;
+                this.showNotification('❌ Failed to enable push notifications: ' + (result.error || 'Unknown error'), 'error');
+                this.updatePushStatus();
+            }
+        } else {
+            const result = await window.pushManager.unsubscribe();
+            console.log('Unsubscribe result:', result);
+            this.showNotification('🔕 Push notifications disabled', 'info');
+            this.updatePushStatus();
+        }
+    });
+    
+    if (testBtn) {
+        testBtn.addEventListener('click', async () => {
+            if (!window.pushManager) {
+                this.showNotification('Push notifications not available', 'error');
+                return;
+            }
+            
+            const result = await window.pushManager.testNotification();
+            console.log('Test result:', result);
+            
+            if (result.success) {
+                this.showNotification('✅ Test notification sent! Check your browser.', 'success');
+            } else {
+                this.showNotification('❌ Failed to send test notification: ' + (result.error || 'Unknown error'), 'error');
+            }
+        });
+    }
+}
+
+updatePushStatus() {
+    const statusEl = document.getElementById('pushStatus');
+    const testBtn = document.getElementById('pushTestBtn');
+    const toggle = document.getElementById('pushToggle');
+    
+    if (!statusEl) return;
+    
+    // Check if push is supported
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+        statusEl.textContent = '❌ Push notifications not supported in this browser';
+        statusEl.className = 'error';
+        if (toggle) toggle.disabled = true;
+        return;
+    }
+    
+    // Check permission
+    if (Notification.permission === 'denied') {
+        statusEl.textContent = '❌ Notifications blocked. Please enable in browser settings.';
+        statusEl.className = 'error';
+        if (toggle) {
+            toggle.checked = false;
+            toggle.disabled = true;
+        }
+        return;
+    }
+    
+    // Check if subscribed
+    if (window.pushManager && window.pushManager.isSubscribed) {
+        statusEl.textContent = '✅ Push notifications enabled';
+        statusEl.className = 'success';
+        if (testBtn) testBtn.style.display = 'inline-block';
+    } else {
+        statusEl.textContent = '🔕 Push notifications disabled. Toggle to enable.';
+        statusEl.className = 'info';
+        if (testBtn) testBtn.style.display = 'none';
     }
 }
 

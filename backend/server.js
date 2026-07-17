@@ -7,6 +7,10 @@ const cron = require('node-cron');
 const path = require('path');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
+const pushRoutes = require('./routes/push');
+
+const PushService = require('./utils/pushService');
+const pushService = new PushService();
 
 
 // Import EmailService
@@ -126,6 +130,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/rota', rotaRoutes);
 app.use('/api/swap', swapRoutes);
 app.use('/api/profile', profileRoutes);
+app.use('/api/push', pushRoutes);
 
 // ============================================
 // NOTIFICATION SERVICE
@@ -158,16 +163,39 @@ io.on('connection', (socket) => {
 // CRON JOB - 7:00 AM DAILY REMINDER
 // ============================================
 
+
+// Update cron job
 cron.schedule('0 7 * * *', async () => {
     try {
         const todaySweeper = await Rota.getTodaysSweeper();
+        
         if (todaySweeper && !todaySweeper.is_completed) {
-            const message = `🧹 Good morning ${todaySweeper.name}! It's your day to sweep the room. Please mark as swept when done.`;
-            notificationService.sendRealtimeNotification(todaySweeper.user_id, message);
-            console.log('📨 Morning reminder sent to:', todaySweeper.name);
+            const today = new Date().toISOString().split('T')[0];
+            
+            // 1. Socket.io notification
+            notificationService.sendRealtimeNotification(
+                todaySweeper.user_id, 
+                `🧹 Good morning ${todaySweeper.name}! It's your day to sweep the room.`
+            );
+            
+            // 2. Email notification
+            await emailService.sendSweepingReminder(todaySweeper, today);
+            
+            // // 3. WhatsApp notification (if available)
+            // if (todaySweeper.whatsapp_enabled) {
+            //     await whatsappService.sendSweepingReminder(todaySweeper, today);
+            // }
+            
+            // 4. Push notification (NEW!)
+            const pushResult = await pushService.sendSweepingReminder(todaySweeper);
+            if (pushResult.success && pushResult.sent > 0) {
+                console.log(`🔔 Push notification sent to ${todaySweeper.name}`);
+            }
+            
+            console.log(`📨 Morning reminders sent to: ${todaySweeper.name}`);
         }
     } catch (error) {
-        console.error('Error sending daily reminder:', error);
+        console.error('Error sending daily reminders:', error);
     }
 });
 
