@@ -425,6 +425,101 @@ class ProfileController {
             });
         }
     }
+
+    // ============================================
+// GET OTHER USER'S PROFILE
+// ============================================
+static async getUserProfile(req, res) {
+    try {
+        const userId = req.params.userId;
+        const currentUserId = req.session.userId;
+        
+        if (!currentUserId) {
+            return res.status(401).json({
+                success: false,
+                error: 'Not authenticated'
+            });
+        }
+        
+        // Get user data
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                error: 'User not found'
+            });
+        }
+        
+        // Get user stats
+        const [stats] = await pool.query(
+            `SELECT 
+                COUNT(CASE WHEN is_completed = TRUE THEN 1 END) as total_sweeps,
+                COUNT(CASE WHEN is_completed = TRUE AND schedule_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY) THEN 1 END) as monthly_sweeps,
+                MAX(completed_at) as last_sweep_date
+             FROM rota_schedule 
+             WHERE user_id = ?`,
+            [userId]
+        );
+        
+        // Get streak
+        const [streak] = await pool.query(
+            `SELECT COUNT(*) as streak 
+             FROM rota_schedule 
+             WHERE user_id = ? 
+             AND is_completed = TRUE 
+             AND schedule_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+             ORDER BY schedule_date DESC`,
+            [userId]
+        );
+        
+        // Get rank
+        const [rankResult] = await pool.query(
+            `SELECT COUNT(*) + 1 as \`rank\`
+             FROM (
+                 SELECT user_id, COUNT(*) as total
+                 FROM rota_schedule
+                 WHERE is_completed = TRUE
+                 GROUP BY user_id
+             ) as user_stats
+             WHERE total > (
+                 SELECT COUNT(*)
+                 FROM rota_schedule
+                 WHERE user_id = ? AND is_completed = TRUE
+             )`,
+            [userId]
+        );
+        
+        // Check if this user is the current user
+        const isOwnProfile = userId == currentUserId;
+        
+        res.json({
+            success: true,
+            user: {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                phone: user.phone || '',
+                bio: user.bio || '',
+                avatar_url: user.avatar_url || '',
+                created_at: user.created_at,
+                is_own_profile: isOwnProfile
+            },
+            stats: {
+                total_sweeps: stats[0]?.total_sweeps || 0,
+                monthly_sweeps: stats[0]?.monthly_sweeps || 0,
+                streak: streak[0]?.streak || 0,
+                rank: rankResult[0]?.rank || 1,
+                last_sweep: stats[0]?.last_sweep_date
+            }
+        });
+    } catch (error) {
+        console.error('Error getting user profile:', error);
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+}
 }
 
 // Export the upload middleware

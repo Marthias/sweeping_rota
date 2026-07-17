@@ -420,64 +420,85 @@ class SweepingRotaApp {
         }
     }
 
-    displaySchedule(schedule) {
-        const list = document.getElementById('scheduleList');
-        
-        if (schedule.length === 0) {
-            list.innerHTML = '<li style="text-align: center; color: #666; padding: 20px;">No upcoming schedule</li>';
-            return;
-        }
+   displaySchedule(schedule) {
+    const list = document.getElementById('scheduleList');
+    
+    if (schedule.length === 0) {
+        list.innerHTML = '<li style="text-align: center; color: #666; padding: 20px;">No upcoming schedule</li>';
+        return;
+    }
 
-        list.innerHTML = schedule.map(item => {
-            const date = new Date(item.schedule_date);
-            const dateStr = date.toLocaleDateString('en-US', { 
-                weekday: 'short', 
-                month: 'short', 
-                day: 'numeric' 
-            });
-            
-            const isCurrentUser = this.currentUser && this.currentUser.id === item.user_id;
-            
-            return `
-                <li class="schedule-item">
-                    <span class="date">${dateStr}</span>
-                    <span class="person">
+    list.innerHTML = schedule.map(item => {
+        const date = new Date(item.schedule_date);
+        const dateStr = date.toLocaleDateString('en-US', { 
+            weekday: 'short', 
+            month: 'short', 
+            day: 'numeric' 
+        });
+        
+        const isCurrentUser = this.currentUser && this.currentUser.id === item.user_id;
+        
+        return `
+            <li class="schedule-item">
+                <span class="date">${dateStr}</span>
+                <span class="person">
+                    <span class="roommate-name" onclick="window.app.viewUserProfile(${item.user_id})" title="Click to view profile">
                         ${item.name} ${isCurrentUser ? '⭐' : ''}
-                        <span class="status ${item.is_completed ? 'status-completed' : 'status-pending'}">
-                            ${item.is_completed ? '✅' : '⏳'}
-                        </span>
                     </span>
-                </li>
-            `;
-        }).join('');
-    }
-
+                    <span class="status ${item.is_completed ? 'status-completed' : 'status-pending'}">
+                        ${item.is_completed ? '✅' : '⏳'}
+                    </span>
+                </span>
+            </li>
+        `;
+    }).join('');
+}
     async markAsSwept() {
-        if (!this.todaySweeper) return;
+    if (!this.todaySweeper) return;
+    
+    // Show loading state
+    const sweptBtn = document.getElementById('sweptBtn');
+    sweptBtn.disabled = true;
+    sweptBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+    
+    try {
+        const response = await fetch('/api/rota/swept', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ rotaId: this.todaySweeper.id }),
+            credentials: 'include'
+        });
         
-        try {
-            const response = await fetch('/api/rota/swept', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ rotaId: this.todaySweeper.id }),
-                credentials: 'include'
-            });
+        const data = await response.json();
+        
+        if (data.success) {
+            this.showNotification('Great job! Room marked as swept! 🎉', 'success');
             
-            const data = await response.json();
+            // Update all UI components immediately
+            await this.loadTodaySweeper();
+            await this.loadUpcomingSchedule();
+            await this.loadSwapData();
+            await this.loadStats();
+            await this.loadProfile();
             
-            if (data.success) {
-                this.showNotification('✅ Great job! Room marked as swept! 🎉', 'success');
-                await this.loadTodaySweeper();
-                await this.loadUpcomingSchedule();
-            } else {
-                this.showNotification('❌ Failed to mark as swept', 'error');
-            }
-        } catch (error) {
-            console.error('Error marking as swept:', error);
-            this.showNotification('❌ Error marking as swept', 'error');
+            // Also refresh calendar if visible
+            const today = new Date();
+            this.loadCalendar(today.getFullYear(), today.getMonth());
+            
+            this.showNotification('All views updated!', 'success');
+        } else {
+            this.showNotification('❌ Failed to mark as swept', 'error');
+            // Re-enable button
+            sweptBtn.disabled = false;
+            sweptBtn.innerHTML = '<i class="fas fa-check"></i> I\'ve Swept!';
         }
+    } catch (error) {
+        console.error('Error marking as swept:', error);
+        this.showNotification('❌ Error marking as swept', 'error');
+        sweptBtn.disabled = false;
+        sweptBtn.innerHTML = '<i class="fas fa-check"></i> I\'ve Swept!';
     }
-
+}
     async generateRota() {
         try {
             const response = await fetch('/api/rota/generate', {
@@ -488,7 +509,7 @@ class SweepingRotaApp {
             const data = await response.json();
             
             if (data.success) {
-                this.showNotification('✅ New rota generated successfully!', 'success');
+                this.showNotification('New rota generated successfully!', 'success');
                 await this.loadTodaySweeper();
                 await this.loadUpcomingSchedule();
             } else {
@@ -618,41 +639,74 @@ async loadStats() {
     }
 }
 
+// displayStats(stats) {
+//     const content = document.getElementById('statsContent');
+    
+//     if (!stats.sweeps || stats.sweeps.length === 0) {
+//         content.innerHTML = '<p style="text-align: center; color: #666;">No stats available yet</p>';
+//         return;
+//     }
+
+//     let html = `
+//         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-bottom: 20px;">
+//             <div style="background: #667eea; color: white; padding: 15px; border-radius: 12px; text-align: center;">
+//                 <div style="font-size: 1.8rem; font-weight: bold;">${stats.totalCompleted}</div>
+//                 <div style="font-size: 0.85rem; opacity: 0.9;">Total Sweeps</div>
+//             </div>
+//             ${stats.topStreak ? `
+//             <div style="background: #ffc107; color: #333; padding: 15px; border-radius: 12px; text-align: center;">
+//                 <div style="font-size: 1.8rem; font-weight: bold;">${stats.topStreak.streak_30days}</div>
+//                 <div style="font-size: 0.85rem; opacity: 0.9;">${stats.topStreak.name}'s Streak</div>
+//             </div>
+//             ` : ''}
+//             <div style="background: #28a745; color: white; padding: 15px; border-radius: 12px; text-align: center;">
+//                 <div style="font-size: 1.8rem; font-weight: bold;">${stats.sweeps.length}</div>
+//                 <div style="font-size: 0.85rem; opacity: 0.9;">Active Sweepers</div>
+//             </div>
+//         </div>
+//         <div style="margin-top: 15px;">
+//             <h3 style="margin-bottom: 10px; font-size: 0.95rem; color: #666;">🏆 Leaderboard</h3>
+//             <ul style="list-style: none;">
+//     `;
+
+//     stats.sweeps.slice(0, 5).forEach((user, index) => {
+//         const medals = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣'];
+//         html += `
+//             <li style="display: flex; justify-content: space-between; padding: 8px 12px; background: white; margin-bottom: 5px; border-radius: 8px;">
+//                 <span>${medals[index] || `${index + 1}.`} ${user.name}</span>
+//                 <span style="font-weight: bold; color: #667eea;">${user.total_sweeps} sweeps</span>
+//             </li>
+//         `;
+//     });
+
+//     html += `</ul></div>`;
+//     content.innerHTML = html;
+// }
+
+
+
 displayStats(stats) {
     const content = document.getElementById('statsContent');
     
-    if (!stats.sweeps || stats.sweeps.length === 0) {
+    if (!stats || stats.length === 0) {
         content.innerHTML = '<p style="text-align: center; color: #666;">No stats available yet</p>';
         return;
     }
 
     let html = `
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-bottom: 20px;">
-            <div style="background: #667eea; color: white; padding: 15px; border-radius: 12px; text-align: center;">
-                <div style="font-size: 1.8rem; font-weight: bold;">${stats.totalCompleted}</div>
-                <div style="font-size: 0.85rem; opacity: 0.9;">Total Sweeps</div>
-            </div>
-            ${stats.topStreak ? `
-            <div style="background: #ffc107; color: #333; padding: 15px; border-radius: 12px; text-align: center;">
-                <div style="font-size: 1.8rem; font-weight: bold;">${stats.topStreak.streak_30days}</div>
-                <div style="font-size: 0.85rem; opacity: 0.9;">${stats.topStreak.name}'s Streak</div>
-            </div>
-            ` : ''}
-            <div style="background: #28a745; color: white; padding: 15px; border-radius: 12px; text-align: center;">
-                <div style="font-size: 1.8rem; font-weight: bold;">${stats.sweeps.length}</div>
-                <div style="font-size: 0.85rem; opacity: 0.9;">Active Sweepers</div>
-            </div>
-        </div>
         <div style="margin-top: 15px;">
             <h3 style="margin-bottom: 10px; font-size: 0.95rem; color: #666;">🏆 Leaderboard</h3>
             <ul style="list-style: none;">
     `;
 
-    stats.sweeps.slice(0, 5).forEach((user, index) => {
+    stats.slice(0, 5).forEach((user, index) => {
         const medals = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣'];
         html += `
-            <li style="display: flex; justify-content: space-between; padding: 8px 12px; background: white; margin-bottom: 5px; border-radius: 8px;">
-                <span>${medals[index] || `${index + 1}.`} ${user.name}</span>
+            <li style="display: flex; justify-content: space-between; padding: 8px 12px; background: white; margin-bottom: 5px; border-radius: 8px; cursor: pointer;" 
+                onclick="window.app.viewUserProfile(${user.id})" 
+                onmouseover="this.style.transform='translateX(5px)'" 
+                onmouseout="this.style.transform='translateX(0)'">
+                <span>${medals[index] || `${index + 1}.`} <span style="font-weight: 500;">${user.name}</span></span>
                 <span style="font-weight: bold; color: #667eea;">${user.total_sweeps} sweeps</span>
             </li>
         `;
@@ -662,7 +716,7 @@ displayStats(stats) {
     content.innerHTML = html;
 }
 
-//new code starts here 
+
 
 // ============================================
 // SWAP FEATURE
@@ -1169,7 +1223,7 @@ async saveProfile() {
         const data = await response.json();
         
         if (data.success) {
-            this.showNotification('✅ Profile updated successfully!', 'success');
+            this.showNotification('Profile updated successfully!', 'success');
             document.getElementById('editProfileForm').style.display = 'none';
             await this.loadProfile();
             document.getElementById('userName').textContent = `👋 ${data.user.name}`;
@@ -1204,7 +1258,7 @@ async uploadAvatar(event) {
         const data = await response.json();
         
         if (data.success) {
-            this.showNotification('✅ Avatar updated!', 'success');
+            this.showNotification('Avatar updated!', 'success');
             await this.loadProfile();
         } else {
             this.showNotification('❌ ' + data.error, 'error');
@@ -1248,7 +1302,7 @@ async changePassword() {
         const data = await response.json();
         
         if (data.success) {
-            this.showNotification('✅ Password changed successfully!', 'success');
+            this.showNotification('Password changed successfully!', 'success');
             document.getElementById('changePasswordForm').style.display = 'none';
             document.getElementById('currentPassword').value = '';
             document.getElementById('newPassword').value = '';
@@ -1298,6 +1352,142 @@ async deleteAccount() {
         this.showNotification('Error deleting account', 'error');
     }
 }
+
+
+async saveProfile() {
+    const name = document.getElementById('editName').value.trim();
+    const email = document.getElementById('editEmail').value.trim();
+    const phone = document.getElementById('editPhone').value.trim();
+    const bio = document.getElementById('editBio').value.trim();
+    
+    if (!name || !email) {
+        this.showNotification('Name and email are required', 'error');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/api/profile/update', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email, phone, bio }),
+            credentials: 'include'
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            this.showNotification('Profile updated successfully!', 'success');
+            document.getElementById('editProfileForm').style.display = 'none';
+            
+            // RELOAD PROFILE IMMEDIATELY
+            await this.loadProfile();
+            
+            // Update header
+            document.getElementById('userName').textContent = `👋 ${data.user.name}`;
+            
+            // Update notification
+            this.showNotification('Bio updated successfully!', 'success');
+        } else {
+            this.showNotification('❌ ' + data.error, 'error');
+        }
+    } catch (error) {
+        console.error('Error saving profile:', error);
+        this.showNotification('Error saving profile', 'error');
+    }
+}
+
+
+  // ============================================
+// VIEW OTHER USER'S PROFILE
+// ============================================
+
+async viewUserProfile(userId) {
+    try {
+        const response = await fetch(`/api/profile/user/${userId}`, {
+            credentials: 'include'
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            this.displayUserProfile(data.user, data.stats);
+            document.getElementById('userProfileModal').style.display = 'block';
+        } else {
+            this.showNotification('Failed to load user profile', 'error');
+        }
+    } catch (error) {
+        console.error('Error loading user profile:', error);
+        this.showNotification('Error loading user profile', 'error');
+    }
+}
+
+displayUserProfile(user, stats) {
+    const container = document.getElementById('userProfileContent');
+    
+    const initials = user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+    const avatarUrl = user.avatar_url || '';
+    
+    container.innerHTML = `
+        <div class="profile-container" style="text-align: center;">
+            <div class="profile-avatar-section">
+                <div class="profile-avatar-wrapper">
+                    ${avatarUrl ? 
+                        `<img src="${avatarUrl}" alt="${user.name}" class="profile-avatar">` :
+                        `<div class="profile-avatar" style="background: #667eea; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; color: white;">${initials}</div>`
+                    }
+                </div>
+            </div>
+            
+            <div class="profile-info">
+                <div class="profile-name">${user.name}</div>
+                <div class="profile-email"><i class="fas fa-envelope"></i> ${user.email}</div>
+                ${user.phone ? `<div class="profile-phone"><i class="fas fa-phone"></i> ${user.phone}</div>` : ''}
+                
+                <div class="profile-bio ${!user.bio ? 'profile-bio-empty' : ''}">
+                    ${user.bio || 'No bio yet.'}
+                </div>
+                
+                <div class="profile-stats-grid">
+                    <div class="profile-stat-item">
+                        <span class="profile-stat-number">${stats.total_sweeps}</span>
+                        <span class="profile-stat-label">🧹 Total Sweeps</span>
+                    </div>
+                    <div class="profile-stat-item">
+                        <span class="profile-stat-number">${stats.streak}</span>
+                        <span class="profile-stat-label">🔥 Day Streak</span>
+                    </div>
+                    <div class="profile-stat-item">
+                        <span class="profile-stat-number">#${stats.rank}</span>
+                        <span class="profile-stat-label">🏆 Rank</span>
+                    </div>
+                    <div class="profile-stat-item">
+                        <span class="profile-stat-number">${stats.monthly_sweeps}</span>
+                        <span class="profile-stat-label">📅 This Month</span>
+                    </div>
+                </div>
+                
+                ${user.is_own_profile ? `
+                    <div style="margin-top: 15px; padding: 10px; background: #d4edda; border-radius: 8px; color: #155724;">
+                        <i class="fas fa-user-check"></i> This is you!
+                    </div>
+                ` : ''}
+            </div>
+        </div>
+    `;
+    
+    // Close modal
+    document.getElementById('closeUserProfile').addEventListener('click', () => {
+        document.getElementById('userProfileModal').style.display = 'none';
+    });
+    
+    document.getElementById('userProfileModal').addEventListener('click', (e) => {
+        if (e.target === document.getElementById('userProfileModal')) {
+            document.getElementById('userProfileModal').style.display = 'none';
+        }
+    });
+}
+
+
+
 
 
 }
