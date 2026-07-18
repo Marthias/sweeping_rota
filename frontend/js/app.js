@@ -1122,7 +1122,9 @@ displayProfile(user, stats) {
 
     container.innerHTML = `
         <div class="profile-container">
+
             <!-- Avatar Section -->
+
             <div class="profile-avatar-section">
                 <div class="profile-avatar-wrapper">
                     ${avatarUrl ? 
@@ -1130,16 +1132,19 @@ displayProfile(user, stats) {
                         `<div class="profile-avatar" style="background: #667eea; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; color: white;">${initials}</div>`
                     }
                     <label class="profile-avatar-upload" title="Change avatar">
-                        <i class="fas fa-camera"></i>
                         <input type="file" id="avatarInput" accept="image/*">
                     </label>
                 </div>
             </div>
             
             <!-- Profile Info -->
+
             <div class="profile-info">
                 <div class="profile-name">${user.name}</div>
-                <div class="profile-email"><i class="fas fa-envelope"></i> ${user.email}</div>
+                <div class="profile-email">
+                  <i class="fas fa-envelope"></i> ${user.email}
+                
+                </div>
                 ${user.phone ? `<div class="profile-phone"><i class="fas fa-phone"></i> ${user.phone}</div>` : ''}
                 
                 <div class="profile-bio ${!user.bio ? 'profile-bio-empty' : ''}">

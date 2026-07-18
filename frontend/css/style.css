@@ -1673,6 +1673,10 @@ body.dark-mode .avatar-list {
     font-size: 0.9rem;
 }
 
+.profile-avatar-upload input {
+    display: none;
+}
+
 .profile-avatar-upload:hover {
     background: #764ba2;
     transform: scale(1.1);
@@ -1899,39 +1903,4 @@ body.dark-mode .quick-card:hover {
 .quick-card {
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
-}
-
-.profile-page-modal{
-
-    width:95%;
-    max-width:700px;
-
-    max-height:90vh;
-
-    overflow-y:auto;
-
-    border-radius:24px;
-
-    animation:modalSlide .35s ease;
-
-}
-
-@keyframes modalSlide{
-
-    from{
-
-        opacity:0;
-
-        transform:translateY(60px);
-
-    }
-
-    to{
-
-        opacity:1;
-
-        transform:translateY(0);
-
-    }
-
 }
