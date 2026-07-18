@@ -3,6 +3,7 @@ class SweepingRotaApp {
         this.apiBase = '';
         this.currentUser = null;
         this.todaySweeper = null;
+        this.initializeDashboardModals();
         this.init();
     }
 
@@ -14,9 +15,11 @@ class SweepingRotaApp {
         this.setupSwapListeners(); 
         this.updateTime();
         setInterval(() => this.updateTime(), 1000);
-        
         await this.checkAuth();
+        
     }
+
+    
 
     updateTime() {
         const now = new Date();
@@ -1790,9 +1793,9 @@ updatePushStatus() {
     }
 }
 
-// ============================================
+
 // TAB SWITCHING
-// ============================================
+
 
 switchTab(tabName) {
     console.log('🔄 Switching to tab:', tabName);
@@ -1866,6 +1869,297 @@ switchTab(tabName) {
     }
 }
 
+
+setupModal(
+    triggerId,
+    modalId,
+    closeId,
+    sectionId,
+    containerId
+) {
+
+    const trigger = document.getElementById(triggerId);
+
+    const modal = document.getElementById(modalId);
+
+    const closeBtn = document.getElementById(closeId);
+
+    const section = document.getElementById(sectionId);
+
+    const container = document.getElementById(containerId);
+
+    if (
+        !trigger ||
+        !modal ||
+        !closeBtn ||
+        !section ||
+        !container
+    ) {
+        return;
+    }
+
+    // Move section only once
+    if (!container.contains(section)) {
+        container.appendChild(section);
+    }
+
+    window.addEventListener("click", (event) => {
+
+    if (event.target === modal) {
+
+        modal.style.display = "none";
+
+    }
+
+});
+
+    closeBtn.onclick = () => {
+
+        modal.style.display = "none";
+
+    };
+
+}
+
+
+initializeDashboardModals() {
+
+    const profileCard = document.querySelector(".quick-card:last-child");
+
+    const profileModal = document.getElementById("profileModal");
+
+    const closeBtn = document.getElementById("closeProfileModal");
+
+    const profileSection = document.getElementById("profileSection");
+
+    const modalContent = document.getElementById("profileModalContent");
+
+    if (
+        !profileCard ||
+        !profileModal ||
+        !closeBtn ||
+        !profileSection ||
+        !modalContent
+    ) {
+        return;
+    }
+
+    // Move the existing profile into the modal
+    modalContent.appendChild(profileSection);
+
+    profileCard.onclick = () => {
+
+        profileModal.style.display = "flex";
+
+    };
+
+    closeBtn.onclick = () => {
+
+        profileModal.style.display = "none";
+
+    };
+
+    window.onclick = (event) => {
+
+        if (event.target === profileModal) {
+
+            profileModal.style.display = "none";
+
+        }
+
+    };
+
+
+    // Schedule Modal
+
+const scheduleCard = document.getElementById("scheduleQuickCard");
+
+const scheduleModal = document.getElementById("scheduleModal");
+
+const closeScheduleBtn = document.getElementById("closeScheduleModal");
+
+const scheduleSection = document.getElementById("upcomingSchedule");
+
+const scheduleModalContent = document.getElementById("scheduleModalContent");
+
+if (
+    scheduleCard &&
+    scheduleModal &&
+    closeScheduleBtn &&
+    scheduleSection &&
+    scheduleModalContent
+) {
+
+    scheduleModalContent.appendChild(scheduleSection);
+
+    scheduleCard.onclick = () => {
+
+        scheduleModal.style.display = "flex";
+
+    };
+
+    closeScheduleBtn.onclick = () => {
+
+        scheduleModal.style.display = "none";
+
+    };
+
+    window.addEventListener("click", (event) => {
+
+        if (event.target === scheduleModal) {
+
+            scheduleModal.style.display = "none";
+
+        }
+
+    });
+
+}
+
+
+// Stats Modal
+
+const statsCard = document.getElementById("statsQuickCard");
+
+const statsModal = document.getElementById("statsModal");
+
+const closeStatsModal = document.getElementById("closeStatsModal");
+
+const statsSection = document.getElementById("statsSection");
+
+const statsModalContent = document.getElementById("statsModalContent");
+
+if (
+    !statsCard ||
+    !statsModal ||
+    !closeStatsModal ||
+    !statsSection ||
+    !statsModalContent
+) {
+    return;
+}
+
+statsModalContent.appendChild(statsSection);
+
+statsCard.onclick = () => {
+
+    statsModal.style.display = "flex";
+
+};
+
+closeStatsModal.onclick = () => {
+
+    statsModal.style.display = "none";
+
+};
+
+window.addEventListener("click", (event) => {
+
+    if (event.target === statsModal) {
+
+        statsModal.style.display = "none";
+
+    }
+
+});
+
+
+
+// Swap Requests Modal
+const swapCard = document.getElementById("swapQuickCard");
+
+const swapModal = document.getElementById("swapModal");
+
+const closeSwapModal = document.getElementById("closeSwapModal");
+
+const swapSection = document.getElementById("swapSection");
+
+const swapModalContent = document.getElementById("swapModalContent");
+
+if (
+    !swapCard ||
+    !swapModal ||
+    !closeSwapModal ||
+    !swapSection ||
+    !swapModalContent
+) {
+    return;
+}
+
+swapModalContent.appendChild(swapSection);
+
+swapCard.onclick = () => {
+
+    swapModal.style.display = "flex";
+
+};
+
+closeSwapModal.onclick = () => {
+
+    swapModal.style.display = "none";
+
+};
+
+window.addEventListener("click", (event) => {
+
+    if (event.target === swapModal) {
+
+        swapModal.style.display = "none";
+
+    }
+
+});
+
+// ======================
+// History Modal
+// ======================
+
+const historyCard = document.getElementById("historyQuickCard");
+
+const historyModal = document.getElementById("historyModal");
+
+const closeHistoryModal = document.getElementById("closeHistoryModal");
+
+const historySection = document.getElementById("historySection");
+
+const historyModalContent = document.getElementById("historyModalContent");
+
+if (
+    !historyCard ||
+    !historyModal ||
+    !closeHistoryModal ||
+    !historySection ||
+    !historyModalContent
+) {
+    return;
+}
+
+historyModalContent.appendChild(historySection);
+
+historyCard.onclick = () => {
+
+    historyModal.style.display = "flex";
+
+};
+
+closeHistoryModal.onclick = () => {
+
+    historyModal.style.display = "none";
+
+};
+
+window.addEventListener("click", (event) => {
+
+    if (event.target === historyModal) {
+
+        historyModal.style.display = "none";
+
+    }
+
+});
+
+
+}
 
 }
 
