@@ -99,111 +99,188 @@
             <div id="currentTime"></div>
         </header>
 
-        <main>
-            <!-- Today's Sweeper -->
-            <section id="todaySweeper" class="card">
-                <h2>Today's Sweeper</h2>
-                <div id="sweeperInfo">
-                    <div class="loader">Loading...</div>
+        <main class="page-container">
+            <!-- ============================================ -->
+            <!-- DASHBOARD TAB -->
+            <!-- ============================================ -->
+            <div id="tab-dashboard" class="tab-content active">
+                
+                <!-- Today's Sweeper -->
+                <section id="todaySweeper" class="card">
+                    <h2>Today's Sweeper</h2>
+                    <div id="sweeperInfo">
+                        <div class="loader">Loading...</div>
+                    </div>
+                </section>
+
+                <!-- Quick Action Cards -->
+                <div class="quick-cards-grid">
+                    <!-- Schedule Card -->
+                    <div class="quick-card" onclick="window.app.switchTab('schedule')">
+                        <div class="quick-card-icon">📅</div>
+                        <div class="quick-card-title">Schedule</div>
+                        <div class="quick-card-count" id="scheduleCount">Loading...</div>
+                        <div class="quick-card-arrow">→</div>
+                    </div>
+
+                    <!-- Stats Card -->
+                    <div class="quick-card" onclick="window.app.switchTab('profile')">
+                        <div class="quick-card-icon">🏆</div>
+                        <div class="quick-card-title">Stats</div>
+                        <div class="quick-card-count" id="statsCount">Loading...</div>
+                        <div class="quick-card-arrow">→</div>
+                    </div>
+
+                    <!-- Swaps Card -->
+                    <div class="quick-card" onclick="window.app.switchTab('swaps')">
+                        <div class="quick-card-icon">🔄</div>
+                        <div class="quick-card-title">Swaps</div>
+                        <div class="quick-card-count" id="swapsCount">Loading...</div>
+                        <div class="quick-card-arrow">→</div>
+                    </div>
+
+                    <!-- Profile Card -->
+                    <div class="quick-card" onclick="window.app.switchTab('profile')">
+                        <div class="quick-card-icon">👤</div>
+                        <div class="quick-card-title">Profile</div>
+                        <div class="quick-card-count" id="profileName">View</div>
+                        <div class="quick-card-arrow">→</div>
+                    </div>
                 </div>
-            </section>
 
-            <!-- Upcoming Schedule -->
-            <section id="upcomingSchedule" class="card">
-                <h2>Upcoming Schedule</h2>
-                <ul id="scheduleList"></ul>
-            </section>
+                <!-- Swept History -->
+                <section id="sweptHistory" class="card">
+                    <h2>📜 Swept History</h2>
+                    <ul id="historyList">
+                        <li style="text-align: center; color: #666; padding: 20px;">Loading history...</li>
+                    </ul>
+                </section>
 
-            <!-- Swept History -->
-            <section id="sweptHistory" class="card">
-                <h2><i class="fas fa-history"></i> Swept History</h2>
-                <ul id="historyList">
-               <li style="text-align: center; color: #666; padding: 20px;">Loading history...</li>
-                  </ul>
-            </section>
-
-            <!-- Stats Section -->
-            <section id="statsSection" class="card">
-            <h2><i class="fas fa-trophy"></i> Sweeping Stats</h2>
-            <div id="statsContent">
-            <div class="loader">Loading stats...</div>
+                <!-- Action Buttons -->
+                <div id="actions">
+                    <button id="sweptBtn" class="btn btn-success" disabled>
+                        <i class="fas fa-check"></i> I've Swept!
+                    </button>
+                    <button id="generateRotaBtn" class="btn btn-primary">
+                        <i class="fas fa-sync"></i> Generate New Rota
+                    </button>
+                </div>
             </div>
-            </section>
 
-            <!-- Swap Section -->
-<section id="swapSection" class="card">
-    <h2><i class="fas fa-exchange-alt"></i> Swap Requests</h2>
-    
-    <!-- Create Swap Form -->
-    <div class="swap-form">
-        <h3>Request a Swap</h3>
-        <div class="form-group">
-            <label>Swap With:</label>
-            <select id="swapToUser" class="form-control">
-                <option value="">Select roommate...</option>
-            </select>
-        </div>
-        <div class="form-row">
-            <div class="form-group">
-                <label>Your Day:</label>
-                <input type="date" id="swapFromDate" class="form-control">
+            <!-- ============================================ -->
+            <!-- SCHEDULE TAB -->
+            <!-- ============================================ -->
+            <div id="tab-schedule" class="tab-content">
+                <section id="calendarSection" class="card">
+                    <h2><i class="fas fa-calendar-alt"></i> Full Calendar</h2>
+                    <div id="calendar"></div>
+                    <div style="margin-top: 15px;">
+                        <div class="legend">
+                            <span><span class="legend-color" style="background: #28a745;"></span> Swept</span>
+                            <span><span class="legend-color" style="background: #ffc107;"></span> Pending</span>
+                            <span><span class="legend-color" style="background: #dc3545;"></span> Missed</span>
+                            <span><span class="legend-color" style="background: #667eea;"></span> Today</span>
+                        </div>
+                    </div>
+                </section>
+                
+                <section id="upcomingFull" class="card">
+                    <h2><i class="fas fa-list"></i> All Upcoming</h2>
+                    <ul id="fullScheduleList"></ul>
+                </section>
             </div>
-            <div class="form-group">
-                <label>Their Day:</label>
-                <input type="date" id="swapToDate" class="form-control">
+
+            <!-- ============================================ -->
+            <!-- SWAPS TAB -->
+            <!-- ============================================ -->
+            <div id="tab-swaps" class="tab-content">
+                <section id="swapSection" class="card">
+                    <h2><i class="fas fa-exchange-alt"></i> Swap Requests</h2>
+                    
+                    <!-- Create Swap Form -->
+                    <div class="swap-form">
+                        <h3>Request a Swap</h3>
+                        <div class="form-group">
+                            <label>Swap With:</label>
+                            <select id="swapToUser" class="form-control">
+                                <option value="">Select roommate...</option>
+                            </select>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Your Day:</label>
+                                <input type="date" id="swapFromDate" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label>Their Day:</label>
+                                <input type="date" id="swapToDate" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Message (optional):</label>
+                            <textarea id="swapMessage" class="form-control" rows="2" placeholder="Why do you want to swap?"></textarea>
+                        </div>
+                        <button id="swapRequestBtn" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i> Send Swap Request
+                        </button>
+                    </div>
+                    
+                    <!-- Pending Swaps -->
+                    <div id="pendingSwaps">
+                        <h3>Pending Requests</h3>
+                        <div id="pendingSwapsList">
+                            <p style="color: #888; text-align: center;">No pending swap requests</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Swap History -->
+                    <div id="swapHistory">
+                        <h3>Swap History</h3>
+                        <div id="swapHistoryList">
+                            <p style="color: #888; text-align: center;">No swap history</p>
+                        </div>
+                    </div>
+                </section>
             </div>
-        </div>
-        <div class="form-group">
-            <label>Message (optional):</label>
-            <textarea id="swapMessage" class="form-control" rows="2" placeholder="Why do you want to swap?"></textarea>
-        </div>
-        <button id="swapRequestBtn" class="btn btn-primary">
-            <i class="fas fa-paper-plane"></i> Send Swap Request
-        </button>
-    </div>
-    
-    <!-- Pending Swaps -->
-    <div id="pendingSwaps">
-        <h3>Pending Requests</h3>
-        <div id="pendingSwapsList">
-            <p style="color: #888; text-align: center;">No pending swap requests</p>
-        </div>
-    </div>
-    
-    <!-- Swap History -->
-    <div id="swapHistory">
-        <h3>Swap History</h3>
-        <div id="swapHistoryList">
-            <p style="color: #888; text-align: center;">No swap history</p>
-        </div>
-    </div>
-</section>
 
-<!-- Profile Section -->
-        <section id="profileSection" class="card" style="display: none;">
-
-           <h2>
-              <i class="fas fa-user-circle"></i> My Profile</h2>
-
-           <div id="profileContent">
-               <div class="loader">Loading profile...</div>
-           </div>
-     </section>
-
-            <!-- Action Buttons -->
-            <div id="actions">
-                <button id="sweptBtn" class="btn btn-success" disabled>
-                    <i class="fas fa-check"></i> I've Swept!
-                </button>
-                <button id="generateRotaBtn" class="btn btn-primary">
-                    <i class="fas fa-sync"></i> Generate New Rota
-                </button>
+            <!-- ============================================ -->
+            <!-- PROFILE TAB -->
+            <!-- ============================================ -->
+            <div id="tab-profile" class="tab-content">
+                <section id="profileSection" class="card">
+                    <h2><i class="fas fa-user-circle"></i> My Profile</h2>
+                    <div id="profileContent">
+                        <div class="loader">Loading profile...</div>
+                    </div>
+                </section>
             </div>
         </main>
 
         <footer>
             <p>© 2026 Sweeping Rota | Made with ❤️ by OTrace</p>
         </footer>
+
+        <!-- ============================================ -->
+        <!-- BOTTOM NAVIGATION -->
+        <!-- ============================================ -->
+        <nav class="bottom-nav" id="bottomNav">
+            <button class="nav-item active" data-tab="dashboard">
+                <i class="fas fa-home"></i>
+                <span>Today</span>
+            </button>
+            <button class="nav-item" data-tab="schedule">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Schedule</span>
+            </button>
+            <button class="nav-item" data-tab="swaps">
+                <i class="fas fa-exchange-alt"></i>
+                <span>Swaps</span>
+            </button>
+            <button class="nav-item" data-tab="profile">
+                <i class="fas fa-user"></i>
+                <span>Me</span>
+            </button>
+        </nav>
     </div>
 
     <!-- Settings Modal -->
@@ -279,19 +356,19 @@
     </div>
 
     <!-- User Profile Modal -->
-<div id="userProfileModal" class="modal">
-    <div class="modal-content profile-modal">
-        <div class="modal-header">
-            <h2><i class="fas fa-user"></i> User Profile</h2>
-            <button class="modal-close" id="closeUserProfile">&times;</button>
-        </div>
-        <div class="modal-body">
-            <div id="userProfileContent">
-                <div class="loader">Loading profile...</div>
+    <div id="userProfileModal" class="modal">
+        <div class="modal-content profile-modal">
+            <div class="modal-header">
+                <h2><i class="fas fa-user"></i> User Profile</h2>
+                <button class="modal-close" id="closeUserProfile">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="userProfileContent">
+                    <div class="loader">Loading profile...</div>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
     <script>
     // Password toggle function
@@ -312,25 +389,15 @@
     }
     </script>
 
-            <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
-            <script src="js/socket.js"></script>
-
-            <script src="js/modules/navigation.js"></script>
-            <script src="js/modules/dashboard.js"></script>
-            <script src="js/modules/profile.js"></script>
-            <script src="js/modules/schedule.js"></script>
-            <script src="js/modules/swap.js"></script>
-            <script src="js/modules/stats.js"></script>
-            <script src="js/modules/settings.js"></script>
-
-            <script src="js/app.js"></script>
-            
-
-    </script>
-
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script src="js/socket.js"></script>
+    <script src="js/modules/navigation.js"></script>
+    <script src="js/modules/dashboard.js"></script>
+    <script src="js/modules/profile.js"></script>
+    <script src="js/modules/schedule.js"></script>
+    <script src="js/modules/swap.js"></script>
+    <script src="js/modules/stats.js"></script>
+    <script src="js/modules/settings.js"></script>
+    <script src="js/app.js"></script>
 </body>
-
-
-
 </html>
-

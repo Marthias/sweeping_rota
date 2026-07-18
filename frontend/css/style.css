@@ -1766,3 +1766,137 @@ body.dark-mode #pushStatus.info {
     background: #1a2a3a;
     color: #8ac0d0;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+/* ============================================
+   QUICK CARDS GRID
+   ============================================ */
+
+.quick-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.quick-card {
+    background: white;
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid #e9ecef;
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.quick-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    border-color: #667eea;
+}
+
+.quick-card:active {
+    transform: scale(0.96);
+}
+
+.quick-card-icon {
+    font-size: 1.8rem;
+    margin-bottom: 6px;
+}
+
+.quick-card-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 2px;
+}
+
+.quick-card-count {
+    font-size: 0.75rem;
+    color: #888;
+}
+
+.quick-card-arrow {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    font-size: 0.8rem;
+    color: #ccc;
+    transition: transform 0.3s ease;
+}
+
+.quick-card:hover .quick-card-arrow {
+    transform: translateX(4px);
+    color: #667eea;
+}
+
+/* Dark Mode */
+body.dark-mode .quick-card {
+    background: #1e1e2e;
+    border-color: #2a2a3e;
+}
+
+body.dark-mode .quick-card-title {
+    color: #e0e0e0;
+}
+
+body.dark-mode .quick-card-count {
+    color: #888;
+}
+
+body.dark-mode .quick-card:hover {
+    border-color: #667eea;
+}
+
+/* Mobile Responsive */
+@media (max-width: 480px) {
+    .quick-cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .quick-card {
+        padding: 14px;
+        min-height: 80px;
+    }
+
+    .quick-card-icon {
+        font-size: 1.4rem;
+    }
+
+    .quick-card-title {
+        font-size: 0.8rem;
+    }
+
+    .quick-card-count {
+        font-size: 0.7rem;
+    }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+    .quick-cards-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* Touch-friendly */
+.quick-card {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}

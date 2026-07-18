@@ -593,8 +593,8 @@ class SweepingRotaApp {
 displayHistory(history) {
     const list = document.getElementById('historyList');
     
-    if (history.length === 0) {
-        list.innerHTML = '<li style="text-align: center; color: #666; padding: 20px;">No sweeping history yet</li>';
+    if (!history || history.length === 0) {
+        list.innerHTML = '<li style="text-align: center; color: #888; padding: 20px;">No sweeping history yet</li>';
         return;
     }
 
@@ -605,19 +605,18 @@ displayHistory(history) {
             month: 'short', 
             day: 'numeric' 
         });
-        const completedDate = item.completed_at ? new Date(item.completed_at).toLocaleTimeString('en-US', { 
-            hour: '2-digit', 
-            minute: '2-digit' 
-        }) : '';
+        
+        const isCurrentUser = this.currentUser && this.currentUser.id === item.user_id;
         
         return `
-            <li class="schedule-item history-item">
-                <span class="date">${dateStr}</span>
-                <span class="person">
-                    <i class="fas fa-check-circle" style="color: #28a745;"></i>
-                    ${item.name}
-                    <span style="font-size: 0.75rem; color: #888;">${completedDate}</span>
-                </span>
+            <li class="history-item" onclick="window.app.viewUserProfile(${item.user_id})" style="cursor: pointer;">
+                <div class="history-left">
+                    <span class="history-check">✅</span>
+                    <span class="history-name" style="font-weight: ${isCurrentUser ? '600' : '400'}; color: ${isCurrentUser ? '#667eea' : '#333'};">
+                        ${item.name} ${isCurrentUser ? '⭐' : ''}
+                    </span>
+                </div>
+                <span class="history-date">${dateStr}</span>
             </li>
         `;
     }).join('');
@@ -1107,6 +1106,12 @@ displayProfile(user, stats) {
     
     // Create avatar initials if no avatar
     const initials = user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+
+      // Update the profile name on the quick card
+    const profileName = document.getElementById('profileName');
+    if (profileName) {
+        profileName.textContent = user.name;
+    }
     
     const avatarUrl = user.avatar_url
         ? `${user.avatar_url}?t=${Date.now()}`
@@ -1684,10 +1689,6 @@ displayUserProfile(user, stats) {
 
 // PUSH NOTIFICATIONS
 
-// ============================================
-// PUSH NOTIFICATIONS
-// ============================================
-
 setupPushListeners() {
     const toggle = document.getElementById('pushToggle');
     const testBtn = document.getElementById('pushTestBtn');
@@ -1786,6 +1787,82 @@ updatePushStatus() {
         statusEl.textContent = '🔕 Push notifications disabled. Toggle to enable.';
         statusEl.className = 'info';
         if (testBtn) testBtn.style.display = 'none';
+    }
+}
+
+// ============================================
+// TAB SWITCHING
+// ============================================
+
+switchTab(tabName) {
+    console.log('🔄 Switching to tab:', tabName);
+    
+    // Get all tabs and contents
+    const tabs = document.querySelectorAll('.nav-item');
+    const contents = document.querySelectorAll('.tab-content');
+    
+    // Remove active class from all
+    tabs.forEach(t => t.classList.remove('active'));
+    contents.forEach(c => c.classList.remove('active'));
+    
+    // Find and activate the target tab
+    const targetTab = document.querySelector(`.nav-item[data-tab="${tabName}"]`);
+    const targetContent = document.getElementById(`tab-${tabName}`);
+    
+    if (targetTab) {
+        targetTab.classList.add('active');
+        // Scroll to top of page smoothly
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    
+    if (targetContent) {
+        targetContent.classList.add('active');
+    }
+    
+    // Load content if needed
+    if (tabName === 'profile') {
+        this.loadProfile();
+    } else if (tabName === 'schedule') {
+        this.loadFullSchedule();
+    } else if (tabName === 'swaps') {
+        this.loadSwapData();
+    }
+}
+
+// TAB SWITCHING
+
+switchTab(tabName) {
+    console.log('🔄 Switching to tab:', tabName);
+    
+    // Get all tabs and contents
+    const tabs = document.querySelectorAll('.nav-item');
+    const contents = document.querySelectorAll('.tab-content');
+    
+    // Remove active class from all
+    tabs.forEach(t => t.classList.remove('active'));
+    contents.forEach(c => c.classList.remove('active'));
+    
+    // Find and activate the target tab
+    const targetTab = document.querySelector(`.nav-item[data-tab="${tabName}"]`);
+    const targetContent = document.getElementById(`tab-${tabName}`);
+    
+    if (targetTab) {
+        targetTab.classList.add('active');
+        // Scroll to top of page smoothly
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    
+    if (targetContent) {
+        targetContent.classList.add('active');
+    }
+    
+    // Load content if needed
+    if (tabName === 'profile') {
+        this.loadProfile();
+    } else if (tabName === 'schedule') {
+        this.loadFullSchedule();
+    } else if (tabName === 'swaps') {
+        this.loadSwapData();
     }
 }
 
