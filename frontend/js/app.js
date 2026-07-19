@@ -405,12 +405,68 @@ class SweepingRotaApp {
     //     }
     // }
 
-    displaySweeper(sweeper) {
+//     displaySweeper(sweeper) {
+//     const sweeperInfo = document.getElementById('sweeperInfo');
+//     const isCompleted = sweeper.is_completed;
+//     const isCurrentUser = this.currentUser && this.currentUser.id === sweeper.user_id;
+    
+//     // Get avatar URL or generate initials
+//     const avatarUrl = sweeper.avatar_url 
+//         ? `${sweeper.avatar_url}?t=${Date.now()}` 
+//         : '';
+    
+//     const initials = sweeper.name 
+//         ? sweeper.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) 
+//         : '?';
+    
+//     sweeperInfo.innerHTML = `
+//         <div class="sweeper-card" onclick="window.app.viewUserProfile(${sweeper.user_id})" style="cursor: pointer;">
+//             <div class="sweeper-profile">
+//                 <!-- Avatar -->
+//                 <div class="sweeper-avatar-wrapper" onclick="event.stopPropagation(); window.app.viewUserProfile(${sweeper.user_id})">
+//                     ${avatarUrl ? 
+//                         `<img src="${avatarUrl}" alt="${sweeper.name}" class="sweeper-avatar">` :
+//                         `<div class="sweeper-avatar" style="background: #667eea; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; color: white;">${initials}</div>`
+//                     }
+//                 </div>
+                
+//                 <!-- Sweeper Info -->
+//                 <div class="sweeper-details">
+//                     <div class="sweeper-name">
+//                         ${sweeper.name}
+//                         ${isCurrentUser ? ' <span style="font-size: 0.8rem; color: #ffc107;">⭐ You!</span>' : ''}
+//                     </div>
+//                     <div class="sweeper-contact">
+//                         ${sweeper.phone ? `<span><i class="fas fa-phone"></i> ${sweeper.phone}</span>` : ''}
+//                     </div>
+//                     <div class="badge ${isCompleted ? 'badge-success' : 'badge-warning'}">
+//                         ${isCompleted ? '✅ Swept Today' : '⏳ Pending'}
+//                     </div>
+//                 </div>
+//             </div>
+//         </div>
+//     `;
+
+//     const sweptBtn = document.getElementById('sweptBtn');
+//     if (isCurrentUser && !isCompleted) {
+//         sweptBtn.disabled = false;
+//         sweptBtn.innerHTML = '<i class="fas fa-check"></i> I\'ve Swept!';
+//     } else {
+//         sweptBtn.disabled = true;
+//         if (isCompleted) {
+//             sweptBtn.innerHTML = '<i class="fas fa-check-circle"></i> Already Swept';
+//         } else if (!isCurrentUser) {
+//             sweptBtn.innerHTML = '<i class="fas fa-user"></i> Not Your Turn';
+//         }
+//     }
+// }
+
+displaySweeper(sweeper) {
     const sweeperInfo = document.getElementById('sweeperInfo');
     const isCompleted = sweeper.is_completed;
     const isCurrentUser = this.currentUser && this.currentUser.id === sweeper.user_id;
     
-    // Get avatar URL or generate initials
+    // Get avatar URL
     const avatarUrl = sweeper.avatar_url 
         ? `${sweeper.avatar_url}?t=${Date.now()}` 
         : '';
@@ -421,17 +477,17 @@ class SweepingRotaApp {
     
     sweeperInfo.innerHTML = `
         <div class="sweeper-card" onclick="window.app.viewUserProfile(${sweeper.user_id})" style="cursor: pointer;">
-            <div class="sweeper-profile">
-                <!-- Avatar -->
+            <div class="sweeper-profile-vertical">
+                <!-- Avatar - Centered on Top -->
                 <div class="sweeper-avatar-wrapper" onclick="event.stopPropagation(); window.app.viewUserProfile(${sweeper.user_id})">
                     ${avatarUrl ? 
                         `<img src="${avatarUrl}" alt="${sweeper.name}" class="sweeper-avatar">` :
-                        `<div class="sweeper-avatar" style="background: #667eea; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; color: white;">${initials}</div>`
+                        `<div class="sweeper-avatar">${initials}</div>`
                     }
                 </div>
                 
-                <!-- Sweeper Info -->
-                <div class="sweeper-details">
+                <!-- Sweeper Info - Centered Below -->
+                <div class="sweeper-details-vertical">
                     <div class="sweeper-name">
                         ${sweeper.name}
                         ${isCurrentUser ? ' <span style="font-size: 0.8rem; color: #ffc107;">⭐ You!</span>' : ''}

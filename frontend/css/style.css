@@ -2170,3 +2170,135 @@ body.dark-mode .profile-modal .profile-info > div:last-child {
     background: #2a2a3e !important;
     color: #aaa !important;
 }
+
+/* ============================================
+   SWEEPER CARD - VERTICAL LAYOUT
+   ============================================ */
+
+.sweeper-card {
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.sweeper-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Vertical Profile Layout */
+.sweeper-profile-vertical {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 10px;
+}
+
+/* Avatar - Top */
+.sweeper-avatar-wrapper {
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.sweeper-avatar-wrapper:hover {
+    transform: scale(1.05);
+}
+
+.sweeper-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #667eea;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+    background: #667eea;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: 600;
+    margin: 0 auto;
+}
+
+/* Details - Below Avatar */
+.sweeper-details-vertical {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    width: 100%;
+}
+
+.sweeper-name {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #1a1a2e;
+}
+
+.sweeper-contact {
+    font-size: 0.85rem;
+    color: #888;
+}
+
+.sweeper-contact i {
+    color: #667eea;
+    width: 16px;
+    margin-right: 4px;
+}
+
+.sweeper-details-vertical .badge {
+    display: inline-block;
+    padding: 4px 16px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin-top: 4px;
+}
+
+/* Dark Mode */
+body.dark-mode .sweeper-card {
+    background: #1e1e2e;
+}
+
+body.dark-mode .sweeper-name {
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode .sweeper-contact {
+    color: #888 !important;
+}
+
+body.dark-mode .sweeper-contact i {
+    color: #667eea;
+}
+
+body.dark-mode .sweeper-avatar {
+    border-color: #667eea;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .sweeper-card {
+        padding: 16px;
+    }
+    
+    .sweeper-avatar {
+        width: 60px;
+        height: 60px;
+        font-size: 1.5rem;
+    }
+
+    .sweeper-name {
+        font-size: 1rem;
+    }
+
+    .sweeper-contact {
+        font-size: 0.8rem;
+    }
+}
