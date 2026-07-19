@@ -2,29 +2,29 @@ const pool = require('../config/database');
 
 class Rota {
     static async getTodaysSweeper() {
-        const today = new Date().toISOString().split('T')[0];
-        const [rows] = await pool.query(
-            `SELECT r.*, u.name, u.email, u.phone 
-             FROM rota_schedule r 
-             JOIN users u ON r.user_id = u.id 
-             WHERE r.schedule_date = ? AND r.is_completed = FALSE`,
-            [today]
-        );
-        return rows[0];
-    }
+    const today = new Date().toISOString().split('T')[0];
+    const [rows] = await pool.query(
+        `SELECT r.*, u.name, u.email, u.phone, u.avatar_url 
+         FROM rota_schedule r 
+         JOIN users u ON r.user_id = u.id 
+         WHERE r.schedule_date = ?`,
+        [today]
+    );
+    return rows[0];
+}
 
     static async getNextSweeper() {
-        const today = new Date().toISOString().split('T')[0];
-        const [rows] = await pool.query(
-            `SELECT r.*, u.name, u.email, u.phone 
-             FROM rota_schedule r 
-             JOIN users u ON r.user_id = u.id 
-             WHERE r.schedule_date > ? AND r.is_completed = FALSE 
-             ORDER BY r.schedule_date ASC LIMIT 1`,
-            [today]
-        );
-        return rows[0];
-    }
+    const today = new Date().toISOString().split('T')[0];
+    const [rows] = await pool.query(
+        `SELECT r.*, u.name, u.email, u.phone, u.avatar_url 
+         FROM rota_schedule r 
+         JOIN users u ON r.user_id = u.id 
+         WHERE r.schedule_date > ? AND r.is_completed = FALSE 
+         ORDER BY r.schedule_date ASC LIMIT 1`,
+        [today]
+    );
+    return rows[0];
+}
 
     static async createWeeklyRota(users) {
         const today = new Date();
@@ -125,6 +125,8 @@ static async getStats() {
         totalCompleted: total[0]?.total || 0
     };
 }
+
+
 }
 
 module.exports = Rota;

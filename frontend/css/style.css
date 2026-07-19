@@ -1904,3 +1904,269 @@ body.dark-mode .quick-card:hover {
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
 }
+
+
+
+
+/* ============================================
+   SWEEPER CARD WITH AVATAR
+   ============================================ */
+
+.sweeper-card {
+    padding: 0;
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.sweeper-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.sweeper-profile {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+}
+
+.sweeper-avatar-wrapper {
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.sweeper-avatar-wrapper:hover {
+    transform: scale(1.05);
+}
+
+.sweeper-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #667eea;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+    background: #667eea;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    font-weight: 600;
+}
+
+.sweeper-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.sweeper-name {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #1a1a2e;
+    margin-bottom: 2px;
+}
+
+.sweeper-contact {
+    font-size: 0.85rem;
+    color: #888;
+    margin-bottom: 8px;
+}
+
+.sweeper-contact i {
+    color: #667eea;
+    width: 16px;
+    margin-right: 4px;
+}
+
+.sweeper-details .badge {
+    display: inline-block;
+    padding: 3px 14px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+/* Dark Mode */
+body.dark-mode .sweeper-card {
+    background: #1e1e2e;
+}
+
+body.dark-mode .sweeper-name {
+    color: #e0e0e0;
+}
+
+body.dark-mode .sweeper-contact {
+    color: #888;
+}
+
+body.dark-mode .sweeper-avatar {
+    border-color: #667eea;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .sweeper-profile {
+        padding: 12px 16px;
+        gap: 12px;
+    }
+
+    .sweeper-avatar {
+        width: 48px;
+        height: 48px;
+        font-size: 1.4rem;
+    }
+
+    .sweeper-name {
+        font-size: 1rem;
+    }
+
+    .sweeper-contact {
+        font-size: 0.8rem;
+    }
+}
+
+/* ============================================
+   DARK MODE - SWEEPER CARD
+   ============================================ */
+
+body.dark-mode .sweeper-card {
+    background: #1e1e2e;
+}
+
+body.dark-mode .sweeper-name {
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode .sweeper-contact {
+    color: #888 !important;
+}
+
+body.dark-mode .sweeper-contact i {
+    color: #667eea;
+}
+
+/* ============================================
+   DARK MODE - PROFILE STATS
+   ============================================ */
+
+body.dark-mode .profile-stat-number {
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode .profile-stat-label {
+    color: #888 !important;
+}
+
+body.dark-mode .profile-name {
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode .profile-email {
+    color: #aaa !important;
+}
+
+body.dark-mode .profile-phone {
+    color: #aaa !important;
+}
+
+body.dark-mode .profile-bio {
+    background: #2a2a3e !important;
+    color: #d0d0d0 !important;
+}
+
+body.dark-mode .profile-bio-empty {
+    color: #888 !important;
+}
+
+/* ============================================
+   DARK MODE - PROFILE STATS GRID
+   ============================================ */
+
+body.dark-mode .profile-stats-grid {
+    border-top-color: #2a2a3e !important;
+    border-bottom-color: #2a2a3e !important;
+}
+
+body.dark-mode .profile-stat-item {
+    background: transparent !important;
+}
+
+body.dark-mode .profile-stat-number {
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode .profile-stat-label {
+    color: #888 !important;
+}
+
+/* ============================================
+   DARK MODE - USER PROFILE MODAL
+   ============================================ */
+
+body.dark-mode .profile-modal .modal-content {
+    background: #1e1e2e !important;
+}
+
+body.dark-mode .profile-modal .modal-header {
+    border-bottom-color: #2a2a3e !important;
+}
+
+body.dark-mode .profile-modal .modal-header h2 {
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode .profile-modal .modal-close {
+    color: #888 !important;
+}
+
+body.dark-mode .profile-modal .modal-close:hover {
+    color: #fff !important;
+}
+
+body.dark-mode .profile-modal .profile-name {
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode .profile-modal .profile-email {
+    color: #aaa !important;
+}
+
+body.dark-mode .profile-modal .profile-phone {
+    color: #aaa !important;
+}
+
+body.dark-mode .profile-modal .profile-bio {
+    background: #2a2a3e !important;
+    color: #d0d0d0 !important;
+}
+
+body.dark-mode .profile-modal .profile-bio-empty {
+    color: #888 !important;
+}
+
+body.dark-mode .profile-modal .profile-stat-number {
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode .profile-modal .profile-stat-label {
+    color: #888 !important;
+}
+
+body.dark-mode .profile-modal .profile-stats-grid {
+    border-top-color: #2a2a3e !important;
+    border-bottom-color: #2a2a3e !important;
+}
+
+body.dark-mode .profile-modal .profile-avatar {
+    border-color: #667eea !important;
+}
+
+/* Viewing indicator dark mode */
+body.dark-mode .profile-modal .profile-info > div:last-child {
+    background: #2a2a3e !important;
+    color: #aaa !important;
+}
